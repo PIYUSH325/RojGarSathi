@@ -208,12 +208,6 @@ const JobChatWindow = () => {
 
       try {
         setSending(true);
-
-        const messageData = {
-          message: inputText.trim(),
-          jobId,
-        };
-
         // Add contact info if anonymous
         if (!user && contactInfo) {
           messageData.senderName = contactInfo.name;
