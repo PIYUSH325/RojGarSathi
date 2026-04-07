@@ -201,9 +201,24 @@ const JobChatWindow = () => {
         setShowContactModal(true);
         return;
       }
+      const messageData = {
+      message: inputText.trim(),
+       jobId,
+       };
 
       try {
         setSending(true);
+
+        const messageData = {
+          message: inputText.trim(),
+          jobId,
+        };
+
+        // Add contact info if anonymous
+        if (!user && contactInfo) {
+          messageData.senderName = contactInfo.name;
+          messageData.senderEmail = contactInfo.email;
+        }
 
         if (user) {
           if (!socket.current || !socket.current.connected) {
@@ -221,17 +236,6 @@ const JobChatWindow = () => {
           setError(null);
           setTimeout(() => scrollToBottom(true), 100);
           return;
-        }
-
-        const messageData = {
-          message: inputText.trim(),
-          jobId,
-        };
-
-        // Add contact info if anonymous
-        if (!user && contactInfo) {
-          messageData.senderName = contactInfo.name;
-          messageData.senderEmail = contactInfo.email;
         }
 
         // Send via API with authentication (if available)
@@ -279,6 +283,7 @@ const JobChatWindow = () => {
               setConversationId(refreshedConversationId);
               const retryResponse = await axios.post(
                 `${API_BASE}/chat/message/${refreshedConversationId}`,
+                
                 messageData,
                 { headers }
               );
@@ -306,14 +311,14 @@ const JobChatWindow = () => {
         setSending(false);
       }
     },
-    [inputText, conversationId, isTemporaryConversation, jobId, user, token, API_BASE, sending, navigate, t]
+    [inputText, conversationId, isTemporaryConversation, jobId, user, token, API_BASE, sending, navigate, t, scrollToBottom]
   );
 
   // Handle Enter key
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSendMessage(e);
     }
   };
 
@@ -337,7 +342,7 @@ const JobChatWindow = () => {
             type="button"
             className="btn-close"
             onClick={() => navigate('/messages')}
-          ></button>
+          />
           <h4>{t('jobChatWindow.errorTitle')}</h4>
           <p>{error}</p>
           <button
@@ -419,7 +424,8 @@ const JobChatWindow = () => {
               return (
                 <div
                   key={idx}
-                  className={`message-bubble ${isOwn ? 'sent' : 'received'}`}>
+                  className={`message-bubble ${isOwn ? 'sent' : 'received'}`}
+                >
                   <div className="message-content">
                     {!isOwn && <small className="message-sender">{senderName}</small>}
                     <p className="message-text">{messageContent}</p>
@@ -488,7 +494,7 @@ const JobChatWindow = () => {
                     setShowContactModal(false);
                     setAnonUser({ name: '', email: '' });
                   }}
-                ></button>
+                />
               </div>
               <div className="modal-body">
                 <form>
@@ -523,7 +529,7 @@ const JobChatWindow = () => {
                       onChange={(e) => setInputText(e.target.value)}
                       rows="4"
                       required
-                    ></textarea>
+                    />
                   </div>
                 </form>
               </div>
@@ -563,3 +569,4 @@ const JobChatWindow = () => {
 };
 
 export default JobChatWindow;
+
