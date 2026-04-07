@@ -1,0 +1,51 @@
+/* Messages Page Styles */
+.messages-page {
+  width: 100%;
+  height: 100%;
+  background: #f5f7fa;
+}
+
+/* Inherit Chat Styles */
+.messages-page .chat-page-container {
+  height: calc(100vh - 100px);
+  display: flex;
+  gap: 0;
+}
+
+.messages-page .conversations-panel {
+  flex: 0 0 350px;
+  min-width: 300px;
+  max-width: 400px;
+  background: white;
+  border-right: 1px solid #e9ecef;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.messages-page .chat-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fa;
+  min-width: 0;
+}
+
+/* Responsive: Stack on mobile */
+@media (max-width: 768px) {
+  .messages-page .conversations-panel {
+    flex: 0 0 100%;
+  }
+
+  .messages-page .conversations-panel.hidden-mobile {
+    display: none;
+  }
+
+  .messages-page .chat-panel.hidden-mobile {
+    display: none;
+  }
+
+  .messages-page .chat-panel {
+    flex: 0 0 100%;
+  }
+}

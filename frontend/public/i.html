@@ -1,0 +1,2759 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RojgarSathi - Your Future Awaits</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    spacing: {
+                        '120': '30rem', // Custom height for images
+                    }
+                },
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom styles for smooth transitions and layout */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            animation: slideIn 0.5s ease-out forwards;
+            display: none;
+            /* Hidden by default */
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 24px;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1npdx-1 rgba(0, 0, 0, 0.06);
+            animation: slideIn 0.3s ease-in-out;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Style for the canvas and graph text */
+        .process-graph-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 2rem;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .process-graph-container canvas {
+            display: block;
+            background-color: #f3f4f6;
+            border-radius: 1rem;
+        }
+
+        /* Hero section slider styles */
+        .slider-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none;
+            /* Ensure text and buttons are clickable */
+        }
+
+        .slider-image.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .slider-controls button {
+            transition: background-color 0.3s;
+        }
+
+        .slider-dots .dot {
+            transition: background-color 0.3s;
+        }
+
+        .slider-dots .dot.active {
+            background-color: #ffffff;
+        }
+
+        .image-crop-top {
+            object-fit: cover;
+            object-position: top;
+        }
+
+        /* Notifications styling */
+        .notifications-container {
+            max-height: 300px;
+            overflow-y: auto;
+            transition: all 0.3s ease-in-out;
+            display: none;
+        }
+
+        .notifications-container.active {
+            display: block;
+        }
+
+        /* Marquee styles */
+        .live-updates-container {
+            background-color: #f59e0b;
+            /* Amber 500 */
+            color: #fff;
+            padding: 8px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        .live-updates-container .live-icon {
+            margin-left: 1rem;
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+
+        .live-updates-container marquee {
+            flex: 1;
+            min-width: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <div id="message-box" class="message-box bg-green-500 text-white"></div>
+
+    <div id="applicant-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('applicant-modal')">&times;</span>
+            <h2 id="modal-title" class="text-2xl font-bold mb-4"></h2>
+            <ul id="applicant-list" class="space-y-2">
+            </ul>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('profile-modal')">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Edit Professional Profile</h2>
+            <form id="profile-editor-form">
+                <div>
+                    <label for="profile-text" class="block text-gray-700 font-semibold mb-2">Profile Summary</label>
+                    <textarea id="profile-text" name="profile-text" rows="6"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                        placeholder="Write a professional summary about yourself."></textarea>
+                </div>
+                <div class="mt-6 flex justify-end space-x-4">
+                    <button type="button" onclick="closeModal('profile-modal')"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors">Save
+                        Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <nav class="bg-white shadow-lg fixed top-0 left-0 w-full z-[100]">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-2 text-2xl font-bold text-indigo-600" data-page="home">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>RojgarSathi</span>
+            </a>
+
+            <div class="space-x-4 flex items-center">
+                <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors nav-link" data-page="home"
+                    id="nav-home">Home</a>
+                <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors nav-link"
+                    data-page="job-listings" id="nav-jobs">Jobs</a>
+                <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors nav-link hidden"
+                    data-page="my-applications" id="nav-my-applications">My Applications</a>
+                <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors nav-link hidden"
+                    data-page="saved-jobs" id="nav-saved-jobs">Saved Jobs</a>
+                <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors nav-link hidden"
+                    data-page="profile" id="nav-profile">Profile</a>
+                <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors nav-link" data-page="about"
+                    id="nav-about">About</a>
+                <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors nav-link" data-page="contact"
+                    id="nav-contact">Contact</a>
+                <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors nav-link hidden"
+                    data-page="post-job" id="nav-post-job">Post a Job</a>
+                <a href="#"
+                    class="text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-full font-semibold transition-colors nav-link"
+                    data-page="login" id="nav-login">Login</a>
+                <a href="#"
+                    class="text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-full font-semibold transition-colors nav-link hidden"
+                    id="nav-logout">Logout</a>
+
+                <div class="relative">
+                    <button id="notification-toggle-icon" class="text-gray-600 hover:text-indigo-600 transition-colors">
+                        <i class="fa-solid fa-bell text-xl"></i>
+                    </button>
+                    <span id="notification-badge"
+                        class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full hidden">
+                        0
+                    </span>
+                </div>
+
+                <div id="nav-profile-img-container" class="relative ml-4 hidden">
+                    <img id="nav-profile-img" src="https://via.placeholder.com/150" alt="Profile" class="w-10 h-10 rounded-full cursor-pointer" data-page="profile">
+                    <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-white">
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="live-updates-container">
+            <span class="live-icon"><i class="fa-solid fa-bullhorn"></i> Live Updates</span>
+            <marquee id="live-updates-marquee" scrollamount="5"></marquee>
+        </div>
+        <div id="notification-popover"
+            class="notifications-container absolute right-4 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 z-50">
+            <div class="p-4 border-b border-gray-200">
+                <h3 class="text-lg font-bold">Notifications</h3>
+            </div>
+            <ul id="notification-list" class="p-4 space-y-2">
+            </ul>
+        </div>
+    </nav>
+
+    <main class="pt-28 pb-10">
+        <div id="home-page" class="page active">
+        </div>
+
+        <div id="job-listings-page" class="page">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl font-bold text-center mb-8">All Job Listings</h1>
+                <div class="flex justify-end mb-6">
+                    <select id="sort-by-select" class="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        <option value="date_desc">Sort by: Newest</option>
+                        <option value="date_asc">Sort by: Oldest</option>
+                        <option value="location_asc">Sort by: Location (A-Z)</option>
+                        <option value="location_desc">Sort by: Location (Z-A)</option>
+                    </select>
+                </div>
+                <div id="all-jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+                <div id="pagination-container" class="flex justify-center mt-8">
+                </div>
+            </div>
+        </div>
+
+        <div id="job-detail-page" class="page">
+            <div class="container mx-auto px-4">
+                <button onclick="showPage('job-listings-page')"
+                    class="mb-4 text-indigo-600 hover:text-indigo-800 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Jobs
+                </button>
+                <div id="job-detail-content" class="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+                </div>
+            </div>
+        </div>
+
+        <div id="my-applications-page" class="page">
+            <!-- Content will be rendered here by JavaScript -->
+        </div>
+
+        <div id="saved-jobs-page" class="page">
+            <!-- Content will be rendered here by JavaScript -->
+        </div>
+
+        <div id="edit-job-page" class="page">
+            <!-- Content will be rendered here by JavaScript -->
+        </div>
+
+        <div id="profile-page" class="page">
+        </div>
+
+        <div id="about-page" class="page">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl font-bold text-center mb-8">About Us</h1>
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 text-lg leading-relaxed">
+                    <p class="mb-4">Welcome to RojgarSathi, your premier destination for finding the perfect career
+                        opportunity. Our mission is to connect talented individuals with great companies, making the job
+                        search process simple and efficient.</p>
+                    <p class="mb-4">Founded in 2023, RojgarSathi was created with the vision of building a platform that
+                        goes beyond traditional job boards. We believe in providing a seamless experience for both job
+                        seekers and employers, leveraging technology to match the right talent with the right roles.</p>
+                    <p>Our team is passionate about helping people achieve their professional goals. Whether you're just
+                        starting your career, looking for a change, or an experienced professional, RojgarSathi is here to
+                        support you every step of the way.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="contact-page" class="page">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl font-bold text-center mb-8">Contact Us</h1>
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-2xl mx-auto">
+                    <p class="mb-6 text-lg">We'd love to hear from you! Please fill out the form below and we'll get
+                        back to you as soon as possible.</p>
+                    <form id="contact-form" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-gray-700 font-semibold mb-2">Name</label>
+                            <input type="text" id="name" name="name" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-gray-700 font-semibold mb-2">Email</label>
+                            <input type="email" id="email" name="email" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-gray-700 font-semibold mb-2">Message</label>
+                            <textarea id="message" name="message" rows="5" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"></textarea>
+                        </div>
+                        <button type="submit"
+                            class="w-full p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">Send
+                            Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="login-page" class="page">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl font-bold text-center mb-8">Login</h1>
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-md mx-auto">
+                    <h3 class="text-lg text-indigo-600 font-semibold text-center mb-6">
+                        The process is simple:
+                    </h3>
+                    <div class="process-graph-container">
+                        <canvas id="login-process-graph"></canvas>
+                    </div>
+                    <form id="login-form" class="space-y-6">
+                        <div>
+                            <label for="login-email" class="block text-gray-700 font-semibold mb-2">Email</label>
+                            <input type="email" id="login-email" name="email" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        </div>
+                        <div>
+                            <label for="login-password" class="block text-gray-700 font-semibold mb-2">Password</label>
+                            <input type="password" id="login-password" name="password" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        </div>
+                        <div>
+                            <label for="login-role" class="block text-gray-700 font-semibold mb-2">Login as</label>
+                            <select id="login-role" name="role" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                                <option value="job-seeker">Job Seeker</option>
+                                <option value="job-provider">Job Provider</option>
+                            </select>
+                        </div>
+                        <button type="submit"
+                            class="w-full p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">Login</button>
+                    </form>
+                    <div class="my-4 flex items-center">
+                        <div class="flex-grow border-t border-gray-300"></div>
+                        <span class="flex-shrink mx-4 text-gray-400">OR</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
+                    <a href="/api/auth/google" class="w-full flex items-center justify-center p-3 bg-white border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50">
+                        <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5 mr-2"> Login with Google
+                    </a>
+                    <p class="text-center mt-4">Don't have an account? <a href="#"
+                            class="text-indigo-600 hover:underline" data-page="signup">Sign up here</a></p>
+                    <p class="text-center mt-2"><a href="#" class="text-sm text-gray-500 hover:underline"
+                            data-page="forgot-password">Forgot Password?</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="forgot-password-page" class="page">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl font-bold text-center mb-8">Forgot Password</h1>
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-md mx-auto">
+                    <p class="mb-6 text-center">Enter your email address and we'll send you a link to reset your
+                        password.</p>
+                    <form id="forgot-password-form" class="space-y-6">
+                        <div>
+                            <label for="forgot-email" class="block text-gray-700 font-semibold mb-2">Email</label>
+                            <input type="email" id="forgot-email" required
+                                class="w-full p-3 border border-gray-300 rounded-lg">
+                        </div>
+                        <button type="submit"
+                            class="w-full p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Send
+                            Reset Link</button>
+                    </form>
+                    <p class="text-center mt-4">Remember your password? <a href="#"
+                            class="text-indigo-600 hover:underline" data-page="signup">Sign up here</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="signup-page" class="page">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl font-bold text-center mb-8">Sign Up</h1>
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-md mx-auto">
+                    <h3 class="text-lg text-indigo-600 font-semibold text-center mb-6">
+                        The process is simple:
+                    </h3>
+                    <div class="process-graph-container">
+                        <canvas id="signup-process-graph"></canvas>
+                    </div>
+                    <form id="signup-form" class="space-y-6">
+                        <div>
+                            <label for="signup-name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
+                            <input type="text" id="signup-name" name="name" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        </div>
+                        <div>
+                            <label for="signup-email" class="block text-gray-700 font-semibold mb-2">Email</label>
+                            <input type="email" id="signup-email" name="email" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        </div>
+                        <div>
+                            <label for="signup-password" class="block text-gray-700 font-semibold mb-2">Password</label>
+                            <input type="password" id="signup-password" name="password" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        </div>
+                        <div>
+                            <label for="signup-role" class="block text-gray-700 font-semibold mb-2">Sign up as</label>
+                            <select id="signup-role" name="role" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                                <option value="job-seeker">Job Seeker</option>
+                                <option value="job-provider">Job Provider</option>
+                            </select>
+                        </div>
+                        <button type="submit"
+                            class="w-full p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">Sign
+                            Up</button>
+                    </form>
+                    <p class="text-center mt-4">Already have an account? <a href="#"
+                            class="text-indigo-600 hover:underline" data-page="login">Login here</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="reset-password-page" class="page">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl font-bold text-center mb-8">Reset Your Password</h1>
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-md mx-auto">
+                    <p class="mb-6 text-center">Enter your new password below.</p>
+                    <form id="reset-password-form" class="space-y-6">
+                        <div>
+                            <label for="reset-password" class="block text-gray-700 font-semibold mb-2">New
+                                Password</label>
+                            <input type="password" id="reset-password" required
+                                class="w-full p-3 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="reset-password-confirm" class="block text-gray-700 font-semibold mb-2">Confirm
+                                New Password</label>
+                            <input type="password" id="reset-password-confirm" required
+                                class="w-full p-3 border border-gray-300 rounded-lg">
+                        </div>
+                        <button type="submit"
+                            class="w-full p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Reset
+                            Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="resume-builder-page" class="page">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl font-bold text-center mb-8">Create or Upload Your Resume</h1>
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-4xl mx-auto">
+                    <p class="mb-6 text-lg">Build a professional resume or upload an existing PDF to stand out to
+                        employers.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div id="resume-builder-section">
+                            <h3 class="text-2xl font-bold text-indigo-600 mb-4">Build from Scratch</h3>
+                            <form id="resume-builder-form" class="space-y-6">
+                                <div>
+                                    <h4 class="font-bold mb-2">Contact Information</h4>
+                                    <input type="text" id="resume-name" name="name" placeholder="Full Name" required
+                                        class="w-full p-3 border border-gray-300 rounded-lg mb-2">
+                                    <input type="tel" id="resume-phone" name="phone" placeholder="Phone" required
+                                        class="w-full p-3 border border-gray-300 rounded-lg mb-2">
+                                    <input type="email" id="resume-email" name="email" placeholder="Email" required
+                                        class="w-full p-3 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <h4 class="font-bold mb-2">Professional Summary</h4>
+                                    <textarea id="resume-summary" name="summary" rows="4" required
+                                        class="w-full p-3 border border-gray-300 rounded-lg"
+                                        placeholder="Write a brief summary of your skills and experience."></textarea>
+                                </div>
+                                <button type="submit"
+                                    class="w-full p-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors shadow-md">Save
+                                    Resume</button>
+                            </form>
+                        </div>
+                        <div id="resume-uploader-section">
+                            <h3 class="text-2xl font-bold text-indigo-600 mb-4">Upload PDF</h3>
+                            <form id="resume-uploader-form" class="space-y-6">
+                                <div>
+                                    <label for="resume-pdf" class="block text-gray-700 font-semibold mb-2">Select PDF
+                                        File</label>
+                                    <input type="file" id="resume-pdf" name="pdf" accept="application/pdf" required
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                                </div>
+                                <button type="submit"
+                                    class="w-full p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">Upload
+                                    Resume</button>
+                            </form>
+                            <div id="uploaded-resume-preview" class="mt-4 hidden">
+                                <h4 class="font-bold mb-2">Current Resume:</h4>
+                                <a id="uploaded-resume-link" href="#" target="_blank"
+                                    class="text-blue-600 hover:underline">
+                                    <i class="fa-solid fa-file-pdf"></i> View my Resume
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div>
+                <h4 class="text-2xl font-bold text-indigo-400 mb-4">RojgarSathi</h4>
+                <p class="text-gray-400 text-sm">Connecting India's workforce to local jobs. Your next opportunity awaits!</p>
+                <div class="flex space-x-4 mt-4 text-lg">
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+
+            <div>
+                <h5 class="text-xl font-semibold mb-4 border-b-2 border-indigo-400 pb-1">Quick Links</h5>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors nav-link" data-page="home">Home</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors nav-link" data-page="job-listings">All Jobs</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors nav-link" data-page="about">About Us</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors nav-link" data-page="contact">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h5 class="text-xl font-semibold mb-4 border-b-2 border-indigo-400 pb-1">Job Seekers</h5>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors" onclick="findJobsByLocation()">Jobs Near Me</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors nav-link" data-page="resume-builder">Resume Builder</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors nav-link" data-page="login">Login / Sign Up</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h5 class="text-xl font-semibold mb-4 border-b-2 border-indigo-400 pb-1">Job Providers</h5>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors nav-link" data-page="post-job">Post a Job</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Hire Local Staff</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Pricing Plans (Simulated)</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 text-center mt-8 pt-6 border-t border-gray-700">
+            <p class="text-gray-500 text-sm">&copy; 2023 RojgarSathi. All rights reserved. | Made with ❤️ in India.</p>
+        </div>
+    </footer>
+
+    <script>
+        let allJobs = []; // This will be populated from the backend
+
+        // Sample testimonial data
+        let allTestimonials = [
+            { author: 'Ramesh Singh', role: 'job-seeker', content: 'RojgarSathi helped me find construction work near my home. The daily work listing is a lifesaver.' },
+            { author: 'Suresh Kumar', role: 'job-provider', content: 'We post our daily labour requirements on RojgarSathi and find workers very quickly. It is a very useful platform.' },
+            { author: 'Pooja Devi', role: 'job-seeker', content: 'I found a job as a domestic helper through this app. Now I have a fixed income to support my family.' }
+        ];
+
+        // Notifications data store
+        let notifications = [];
+        let liveUpdates = ['Welcome to RojgarSathi, India\'s #1 job portal for blue-collar workers!', 'Find your next job with just a few clicks. Search by location or job title.'];
+
+        // State variables
+        let currentUserRole = null; // Can be 'job-seeker', 'job-provider', or null
+        let featuredJobs = []; // This will be populated from the backend
+        let loggedInUser = { name: null, email: null, role: null, hasResume: false, resumeData: null, profile: null, profileImage: null, workingHours: null, hourlyRate: null };
+
+        let currentApplicants = []; // To store data for the currently open modal
+        // --- NEW ELEMENT: Filtered Jobs Container ID ---
+        const FILTERED_JOBS_CONTAINER_ID = 'filtered-jobs-results';
+
+        // --- NEW: Role-Based Access Control (RBAC) ---
+        const permissions = {
+            'guest': {
+                canViewJobs: true,
+            },
+            'job-seeker': {
+                canViewJobs: true,
+                canApply: true,
+                canSaveJobs: true,
+                canViewApplications: true,
+                canEditProfile: true,
+            },
+            'job-provider': {
+                canPostJobs: true,
+                canManageJobs: true, // Includes edit and delete
+                canViewApplicants: true,
+                canEditProfile: true,
+            }
+        };
+
+        const hasPermission = (permission) => {
+            const role = currentUserRole || 'guest';
+            return !!permissions[role]?.[permission];
+        };
+
+        // --- Core Application Logic ---
+
+        const getDefaultJobImage = () => {
+            // A generic placeholder image
+            return 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=500&auto=format&fit=crop';
+        };
+
+        /**
+         * Renders a single job card HTML string.
+         * @param {object} job - The job object.
+         * @returns {string} The HTML for the job card.
+         */
+        const createJobCard = (job) => `
+            <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 hover:shadow-xl hover:scale-[1.02] transition-transform duration-300 relative">
+                <div onclick="showJobDetail(${job.id})" class="cursor-pointer">
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full p-2 mr-4 flex-shrink-0 overflow-hidden ${job.imageUrl ? '' : 'flex items-center justify-center'}">
+                            ${job.imageUrl ?
+                                `<img src="${job.imageUrl}" alt="${job.company} logo" class="w-full h-full rounded-full image-crop-top">` :
+                                `<i class="fa-solid fa-briefcase text-2xl text-gray-500"></i>`}
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-indigo-600">${job.title}</h3>
+                            <p class="text-gray-500">${job.company}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-gray-500 text-sm space-x-4 mb-4">
+                        <span><i class="fa-solid fa-location-dot"></i> ${job.location}</span>
+                        <span><i class="fa-solid fa-clock"></i> ${job.type}</span>
+                    </div>
+                    <p class="text-gray-600 text-base line-clamp-2">${job.description}</p>
+                </div>
+                ${hasPermission('canSaveJobs') ? `
+                    <button onclick="handleSaveJob(event, '${job.id}')" class="absolute top-4 right-4 text-gray-400 hover:text-amber-500 transition-colors">
+                        <i class="fa-solid fa-bookmark text-2xl ${loggedInUser.savedJobs && loggedInUser.savedJobs.includes(job.id) ? 'text-amber-500' : ''}"></i>
+                    </button>
+                ` : ''}
+            </div>
+        `;
+
+        /**
+         * Renders the details for a single job.
+         * @param {object} job - The job object.
+         * @returns {string} The HTML for the job detail page.
+         */
+        const createJobDetailContent = (job) => `
+            <div class="w-full h-120 overflow-hidden rounded-xl mb-6 shadow-md">
+                <img src="${job.imageUrl || getDefaultJobImage()}" alt="${job.company} image" class="w-full h-full image-crop-top">
+            </div>
+            <h1 class="text-4xl font-bold text-indigo-600 mb-2">${job.title}</h1>
+            <p class="text-2xl text-gray-600 mb-6">${job.company}</p>
+            <div class="flex flex-wrap items-center text-gray-500 text-lg space-x-6 mb-8">
+                <span><i class="fa-solid fa-location-dot"></i> ${job.location}</span>
+                <span><i class="fa-solid fa-clock"></i> ${job.type}</span>
+                <span><i class="fa-solid fa-calendar-alt"></i> Posted: ${job.posted}</span>
+            </div>
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold mb-4">Job Description</h3>
+                <p class="text-lg leading-relaxed text-gray-700">${job.description}</p>
+            </div>
+            <div>
+                <h3 class="text-2xl font-bold mb-4">How to Apply</h3>
+                <p class="text-lg leading-relaxed text-gray-700">Please send your resume and cover letter to <a href="mailto:careers@rojgarsathi.com" class="text-indigo-600 hover:underline">careers@rojgarsathi.com</a> and reference the job title.</p>
+            </div>
+            <div class="mt-8">
+                ${hasPermission('canApply') ? `
+                    <button onclick="handleApply(event, ${job.id})" class="w-full p-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors shadow-md">Apply Now</button>
+                ` : ''}
+            </div>
+        `;
+
+        /**
+         * Dynamically renders a list of jobs into a container.
+         * @param {Array<object>} jobs - The array of job objects.
+         * @param {string} containerId - The ID of the container to render into.
+         */
+        const renderJobs = (jobs, containerId) => {
+            const container = document.getElementById(containerId); 
+            if (container) {
+                container.innerHTML = jobs.map(createJobCard).join('');
+            }
+        };
+
+        // --- MODIFIED FUNCTION: Filter jobs for categories on the HOME PAGE ---
+        window.filterJobs = (event, keyword) => {
+            let filteredJobs;
+            event.preventDefault(); // Prevent the default anchor behavior
+
+            if (keyword === 'Near Me') {
+                // Redirect to the full job listing page for geolocation results
+                findJobsByLocation(true);
+                return;
+            } else {
+                // 1. Filter the jobs based on the keyword
+                filteredJobs = allJobs.filter(job =>
+                    job.title.toLowerCase().includes(keyword.toLowerCase()) ||
+                    job.description.toLowerCase().includes(keyword.toLowerCase())
+                );
+            }
+
+            // 2. Scroll to the filtered results section
+            const targetElement = document.getElementById('featured-jobs-section');
+            if (targetElement) {
+                 targetElement.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            // 3. Update the dedicated container on the home page
+            const container = document.getElementById(FILTERED_JOBS_CONTAINER_ID);
+            const title = document.getElementById('featured-jobs-title');
+
+            if (container && title) {
+                title.textContent = filteredJobs.length > 0
+                    ? `Showing ${filteredJobs.length} Jobs in: ${keyword}`
+                    : `No Jobs Found in: ${keyword}. Try a broader search.`;
+
+                if (filteredJobs.length > 0) {
+                     container.innerHTML = filteredJobs.map(createJobCard).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center py-10 bg-gray-50 rounded-xl md:col-span-3">
+                            <p class="text-xl text-gray-600">We couldn't find any listings for "${keyword}" right now.</p>
+                            <p class="text-gray-500 mt-2">Check back soon or try a different category!</p>
+                        </div>
+                    `;
+                }
+            }
+        };
+
+
+        /**
+         * Renders the testimonials section for the current user role.
+         * @param {string} role - The current user role ('job-seeker' or 'job-provider').
+         * @returns {string} The HTML for the testimonials section.
+         */
+        const renderTestimonialsSection = (role) => {
+            const relevantTestimonials = allTestimonials.filter(t => t.role === role);
+            return `
+                <div class="container mx-auto px-4 mt-10">
+                    <h2 class="text-3xl font-bold text-center mb-8">What Our Users Say</h2>
+                    <div id="testimonials-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                        ${relevantTestimonials.map(t => `
+                            <div class="bg-white rounded-xl shadow-md p-6">
+                                <p class="text-gray-700 text-lg italic mb-4">"${t.content}"</p>
+                                <div class="flex items-center">
+                                    <div class="bg-gray-200 text-gray-600 rounded-full p-2 mr-3">
+                                        <i class="fa-solid fa-user-circle text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-800">${t.author}</p>
+                                        <p class="text-sm text-gray-500">${t.role === 'job-seeker' ? 'Job Seeker' : 'Job Provider'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-2xl mx-auto">
+                        <h3 class="text-2xl font-bold text-center mb-4">Post a Testimonial</h3>
+                        <form id="post-testimonial-form">
+                            <textarea id="testimonial-content" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 mb-4" placeholder="Share your experience with RojgarSathi..."></textarea>
+                            <button type="submit" class="w-full p-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors shadow-md">Submit Testimonial</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        };
+
+        /**
+         * Adds event listener for the testimonial form.
+         */
+        const addTestimonialFormListener = () => {
+            const testimonialForm = document.getElementById('post-testimonial-form');
+            if (testimonialForm) {
+                testimonialForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const content = document.getElementById('testimonial-content').value.trim();
+                    if (!content) {
+                        showMessage('Testimonial cannot be empty.', 'error');
+                        return;
+                    }
+                    if (!loggedInUser.name) {
+                         showMessage('Please login to post a testimonial.', 'error');
+                         return;
+                    }
+                    const newTestimonial = {
+                        author: loggedInUser.name,
+                        role: currentUserRole,
+                        content: content
+                    };
+                    allTestimonials.push(newTestimonial);
+                    showMessage('Testimonial submitted successfully!');
+                    testimonialForm.reset();
+                    // Re-render the home page content to show the new one
+                    updateUIForRole(false); // Re-render without changing page
+                });
+            }
+        };
+
+        /**
+         * Shows a success or error message in a temporary box.
+         * @param {string} message - The message to display.
+         * @param {string} type - 'success' or 'error' for different colors.
+         */
+        const showMessage = (message, type = 'success') => {
+            const msgBox = document.getElementById('message-box');
+            msgBox.textContent = message;
+            if (type === 'success') {
+                msgBox.classList.remove('bg-red-500');
+                msgBox.classList.add('bg-green-500');
+            } else {
+                msgBox.classList.remove('bg-green-500');
+                msgBox.classList.add('bg-red-500');
+            }
+            msgBox.style.display = 'block';
+            setTimeout(() => {
+                msgBox.style.display = 'none';
+            }, 3000);
+        };
+
+        /**
+         * Navigates to a specific page by showing the requested page and hiding others.
+         * @param {string} pageId - The ID of the page to show (e.g., 'home-page').
+         */
+        const showPage = (pageId) => {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            const currentPage = document.getElementById(pageId);
+            if (currentPage) {
+                currentPage.classList.add('active');
+                if (pageId === 'login-page') {
+                    // If navigating to login, check if there's a redirect query param
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectTo = urlParams.get('redirectTo');
+                    const jobId = urlParams.get('jobId');
+                    if (redirectTo === 'job-detail' && jobId) {
+                        // Store this to redirect back after login
+                        sessionStorage.setItem('postLoginRedirect', JSON.stringify({ page: 'job-detail-page', jobId: jobId }));
+                    } else {
+                        sessionStorage.removeItem('postLoginRedirect');
+                    }
+                    setTimeout(() => drawProcessGraph('login-process-graph'), 100);
+                } else if (pageId === 'signup-page') {
+                    setTimeout(() => drawProcessGraph('signup-process-graph'), 100);
+                } else if (pageId === 'profile-page') {
+                    renderProfilePage();
+                }
+            }
+        };
+
+        /**
+         * Populates and shows the job detail page for a specific job.
+         * @param {number} jobId - The ID of the job to display.
+         */
+        const showJobDetail = (jobId) => {
+            const job = allJobs.find(j => j.id === jobId);
+            const container = document.getElementById('job-detail-content');
+            if (job && container) {
+                container.innerHTML = createJobDetailContent(job);
+                // After rendering, check if the user has applied and update the button
+                const hasApplied = loggedInUser.email && job.applicants.some(app => app.email === loggedInUser.email);
+                const applyButton = container.querySelector('button[onclick^="handleApply"]');
+                if (hasApplied && applyButton) {
+                    applyButton.textContent = 'Applied Successfully';
+                    applyButton.disabled = true;
+                    applyButton.classList.replace('bg-green-600', 'bg-gray-400');
+                }
+                showPage('job-detail-page');
+            }
+        };
+
+        /**
+         * Uses the browser's Geolocation API to find jobs near the user.
+         */
+        const findJobsByLocation = (showAllListings = false) => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    // This is a simple simulated filter. In a real app,
+                    // you would use these coordinates to call a geocoding API
+                    // to find a city name or filter jobs based on proximity.
+                    // For this example, we'll just show all jobs in the major cities.
+                    const majorCities = ['Bengaluru', 'Mumbai', 'Delhi', 'Pune', 'Hyderabad'];
+                    const filteredJobs = allJobs.filter(job => majorCities.includes(job.location));
+
+                    renderJobs(filteredJobs, 'all-jobs-container');
+                    showPage('job-listings-page');
+                    showMessage('Finding jobs near your location...');
+                }, error => {
+                    showMessage('Could not get your location. Please check browser settings.', 'error');
+                });
+            } else {
+                showMessage('Geolocation is not supported by your browser.', 'error');
+            }
+        };
+
+        /**
+         * Handles a job application click.
+         * @param {number} jobId - The ID of the job to apply for.
+         */
+        const handleApply = (event, jobId) => {
+            const job = allJobs.find(j => j.id === jobId);
+            const applyButton = event.target;
+
+            if (!loggedInUser.email) {
+                showMessage('You must be logged in to apply for a job.', 'error');
+                // Redirect to login but remember where to come back
+                window.history.pushState({}, '', `?redirectTo=job-detail&jobId=${jobId}`);
+                showPage('login-page'); // This will now handle the redirect info
+                return;
+            }
+            if (!loggedInUser.hasResume) {
+                showMessage('Please create or upload your resume before applying for a job.', 'error');
+                showPage('resume-builder-page');
+                return;
+            }
+            if (job && loggedInUser.email) {
+                // Check if user has already applied
+                if (!job.applicants.some(app => app.email === loggedInUser.email)) {
+                    job.applicants.push({ email: loggedInUser.email, status: 'Applied' });
+                    showMessage('Application submitted successfully!', 'success');
+                    postNotification(`${loggedInUser.name} has applied for your job: "${job.title}".`, 'new-application', 'job-provider');
+                    addLiveUpdate(`New application for "${job.title}" by ${loggedInUser.name.split(' ')[0]}.`);
+                    // Update button state
+                    applyButton.textContent = 'Applied Successfully';
+                    applyButton.disabled = true;
+                    applyButton.classList.replace('bg-green-600', 'bg-gray-400');
+                } else {
+                    showMessage('You have already applied for this job.', 'error');
+                }
+            }
+        };
+
+        /**
+         * Renders the standard job seeker dashboard.
+         */
+        const renderJobSeekerDashboard = () => {
+            const mainContainer = document.getElementById('home-page');
+            // Rerender the full homepage content
+            mainContainer.innerHTML = `
+                <div class="bg-indigo-600 text-white py-20 rounded-b-3xl relative overflow-hidden">
+                    <div class="absolute inset-0 z-0">
+                           <img src="1.jpg" class="slider-image" data-index="0" alt="Construction workers">
+                           <img src="2.jpg" class="slider-image" data-index="1" alt="Factory workers">
+                           <img src="3.png" class="slider-image" data-index="2" alt="Delivery person with a bike">
+                           <img src="4.jpg" class="slider-image" data-index="3" alt="Housekeeping staff in a hotel">
+                        <div class="bg-indigo-600/70 absolute inset-0"></div>
+                    </div>
+                    <div class="container mx-auto px-4 text-center relative z-20">
+                        <h1 class="text-4xl md:text-6xl font-bold mb-4">Find Your Next Opportunity</h1>
+                        <p class="text-lg md:text-xl mb-8">Discover thousands of jobs for common labour across India.</p>
+                        <form id="search-form" class="max-w-4xl mx-auto flex flex-col md:flex-row gap-4">
+                            <input type="text" id="search-keyword" placeholder="Job title, keywords, or company" class="w-full md:w-2/5 p-4 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 text-gray-800">
+                            <input type="text" id="search-location" placeholder="City or Pincode" class="w-full md:w-1/5 p-4 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 text-gray-800">
+                            <button type="submit" class="w-full md:w-1/5 p-4 bg-white text-indigo-600 font-bold rounded-full shadow-lg hover:bg-gray-200 transition-colors">
+                                <i class="fa-solid fa-magnifying-glass"></i> Search
+                            </button>
+                            <button type="button" onclick="findJobsByLocation()" class="w-full md:w-1/5 p-4 bg-green-500 text-white font-bold rounded-full shadow-lg hover:bg-green-600 transition-colors">
+                                <i class="fa-solid fa-location-crosshairs"></i> Near Me
+                            </button>
+                        </form>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-between px-4 z-20 slider-controls">
+                        <button id="prevBtn" class="bg-black/30 text-white p-3 rounded-full hover:bg-black/50">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button id="nextBtn" class="bg-black/30 text-white p-3 rounded-full hover:bg-black/50">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20 slider-dots">
+                        <button class="dot w-3 h-3 rounded-full bg-white/50 hover:bg-white/80" onclick="currentSlide(0)"></button>
+                        <button class="dot w-3 h-3 rounded-full bg-white/50 hover:bg-white/80" onclick="currentSlide(1)"></button>
+                        <button class="dot w-3 h-3 rounded-full bg-white/50 hover:bg-white/80" onclick="currentSlide(2)"></button>
+                        <button class="dot w-3 h-3 rounded-full bg-white/50 hover:bg-white/80" onclick="currentSlide(3)"></button>
+                    </div>
+                </div>
+
+                <div class="container mx-auto px-4 mt-10">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 my-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                        <div>
+                            <i class="fa-solid fa-briefcase text-4xl text-green-600 mb-2"></i>
+                            <p class="text-3xl font-bold text-gray-800">1000+</p>
+                            <p class="text-gray-500">Jobs Posted</p>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-users text-4xl text-green-600 mb-2"></i>
+                            <p class="text-3xl font-bold text-gray-800">50K+</p>
+                            <p class="text-gray-500">Job Seekers</p>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-map-marked-alt text-4xl text-green-600 mb-2"></i>
+                            <p class="text-3xl font-bold text-gray-800">200+</p>
+                            <p class="text-gray-500">Cities in India</p>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-handshake text-4xl text-green-600 mb-2"></i>
+                            <p class="text-3xl font-bold text-gray-800">50+</p>
+                            <p class="text-gray-500">New Jobs Daily</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container mx-auto px-4 mt-10">
+                    <h2 class="text-3xl font-bold text-center mb-8">Browse By Popular Categories</h2>
+                    <div id="categories-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+                        <a href="#" class="category-card" onclick="filterJobs(event, 'Construction')">
+                            <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl hover:scale-105 transition-all duration-300">
+                                <i class="fa-solid fa-helmet-safety text-4xl text-indigo-600 mb-3"></i>
+                                <p class="font-semibold text-lg">Construction</p>
+                                <p class="text-sm text-gray-500">(${allJobs.filter(j => j.title.includes('Labourer')).length} Jobs)</p>
+                            </div>
+                        </a>
+                        <a href="#" class="category-card" onclick="filterJobs(event, 'Delivery')">
+                            <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl hover:scale-105 transition-all duration-300">
+                                <i class="fa-solid fa-motorcycle text-4xl text-indigo-600 mb-3"></i>
+                                <p class="font-semibold text-lg">Delivery & Driving</p>
+                                <p class="text-sm text-gray-500">(${allJobs.filter(j => j.title.includes('Driver')).length} Jobs)</p>
+                            </div>
+                        </a>
+                        <a href="#" class="category-card" onclick="filterJobs(event, 'Housekeeping')">
+                            <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl hover:scale-105 transition-all duration-300">
+                                <i class="fa-solid fa-broom text-4xl text-indigo-600 mb-3"></i>
+                                <p class="font-semibold text-lg">Housekeeping</p>
+                                <p class="text-sm text-gray-500">(${allJobs.filter(j => j.title.includes('Housekeeping')).length} Jobs)</p>
+                            </div>
+                        </a>
+                        <a href="#" class="category-card" onclick="filterJobs(event, 'Factory')">
+                            <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl hover:scale-105 transition-all duration-300">
+                                <i class="fa-solid fa-industry text-4xl text-indigo-600 mb-3"></i>
+                                <p class="font-semibold text-lg">Factory Work</p>
+                                <p class="text-sm text-gray-500">(${allJobs.filter(j => j.title.includes('Factory')).length} Jobs)</p>
+                            </div>
+                        </a>
+                        <a href="#" class="category-card" onclick="filterJobs(event, 'Security')">
+                            <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl hover:scale-105 transition-all duration-300">
+                                <i class="fa-solid fa-shield-alt text-4xl text-indigo-600 mb-3"></i>
+                                <p class="font-semibold text-lg">Security</p>
+                                <p class="text-sm text-gray-500">(${allJobs.filter(j => j.title.includes('Security')).length} Jobs)</p>
+                            </div>
+                        </a>
+                        <a href="#" class="category-card" onclick="filterJobs(event, 'Shop Helper')">
+                            <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl hover:scale-105 transition-all duration-300">
+                                <i class="fa-solid fa-store text-4xl text-indigo-600 mb-3"></i>
+                                <p class="font-semibold text-lg">Retail & Shop</p>
+                                <p class="text-sm text-gray-500">(${allJobs.filter(j => j.title.includes('Shop Helper')).length} Jobs)</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="container mx-auto px-4 mt-10" id="featured-jobs-section">
+                    <h2 class="text-3xl font-bold text-center mb-8" id="featured-jobs-title">Featured Jobs</h2>
+                    <div id="${FILTERED_JOBS_CONTAINER_ID}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    </div>
+                </div>
+
+                <div class="container mx-auto px-4 mt-10">
+                    <div class="bg-indigo-100 border-l-4 border-indigo-600 p-6 rounded-xl shadow-lg text-center">
+                        <h3 class="text-2xl font-bold text-indigo-800 mb-2">Hiring Staff? Post a Job!</h3>
+                        <p class="text-indigo-600 mb-4">Find reliable workers like construction labourers, delivery drivers, and housekeeping staff quickly and easily.</p>
+                        <a href="#" class="inline-block px-6 py-3 bg-indigo-600 text-white font-bold rounded-full hover:bg-indigo-700 transition-colors shadow-md" data-page="signup">
+                            <i class="fa-solid fa-bullhorn"></i> Get Started - Post Now
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            // Initial rendering of the Featured Jobs (Default)
+            renderJobs(featuredJobs, FILTERED_JOBS_CONTAINER_ID);
+
+            mainContainer.innerHTML += renderTestimonialsSection('job-seeker');
+            addSearchFormListener();
+            addTestimonialFormListener();
+            setupImageSlider();
+        };
+
+
+        /**
+         * Renders the UI for a Job Provider.
+         */
+        const renderJobProviderUI = () => {
+            const mainContainer = document.getElementById('home-page');
+            mainContainer.innerHTML = `
+                <div class="container mx-auto px-4 mt-10">
+                    <div class="bg-blue-50 rounded-xl p-6 mb-8 text-center shadow-md">
+                        <h2 class="text-2xl font-bold text-blue-800 mb-2">Welcome, Job Provider!</h2>
+                        <p class="text-blue-700">Easily post new job openings and manage applications for your existing listings.</p>
+                    </div>
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-center mb-8">Post a New Job</h1>
+                    <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-2xl mx-auto">
+                        <p class="mb-6 text-lg">Fill out the details below to post a new job opening.</p>
+                        <form id="post-job-form" class="space-y-6">
+                            <div>
+                                <label for="job-title" class="block text-gray-700 font-semibold mb-2">Job Title</label>
+                                <input type="text" id="job-title" name="title" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                            </div>
+                            <div>
+                                <label for="job-company" class="block text-gray-700 font-semibold mb-2">Company</label>
+                                <input type="text" id="job-company" name="company" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                            </div>
+                            <div>
+                                <label for="job-location" class="block text-gray-700 font-semibold mb-2">Location</label>
+                                <select id="job-location" name="location" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                                    <option value="Bengaluru">Bengaluru</option>
+                                    <option value="Mumbai">Mumbai</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Pune">Pune</option>
+                                    <option value="Hyderabad">Hyderabad</option>
+                                    <option value="Remote">Remote</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="job-image" class="block text-gray-700 font-semibold mb-2">Company/Job Image</label>
+                                <input type="file" id="job-image" name="image" accept="image/*" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                            </div>
+                            <div>
+                                <label for="job-description" class="block text-gray-700 font-semibold mb-2">Description</label>
+                                <textarea id="job-description" name="description" rows="5" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"></textarea>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <button type="submit" class="w-1/2 p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">Post Job</button>
+                                <button type="button" id="generate-description-btn" class="w-1/2 p-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors shadow-md">✨ Generate Description</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="container mx-auto px-4 mt-10">
+                        <h2 class="text-3xl font-bold text-center mb-8">My Posted Jobs</h2>
+                        <div id="provider-jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        </div>
+                    </div>
+                </div>
+            `;
+            renderProviderJobsList();
+            mainContainer.innerHTML += renderTestimonialsSection('job-provider');
+            addPostJobListener();
+            addDescriptionGeneratorListener();
+            addTestimonialFormListener();
+        };
+
+        /**
+         * Renders the list of jobs posted by the provider.
+         */
+        const renderProviderJobsList = () => {
+            const container = document.getElementById('provider-jobs-container');
+            if (container && hasPermission('canManageJobs')) {
+                // For this simulation, we assume the provider posts all jobs.
+                // In a real app, you would filter by a provider ID.
+                const providerJobs = allJobs;
+                container.innerHTML = providerJobs.length > 0 ? providerJobs.map(job => `
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 hover:shadow-xl transition-shadow">
+                        <div class="cursor-pointer" onclick="showJobDetail(${job.id})">
+                            <div class="flex items-center mb-4">
+                                <div class="w-16 h-16 bg-gray-100 rounded-full p-2 mr-4 flex-shrink-0">
+                                    <img src="${job.imageUrl || getDefaultJobImage()}" alt="${job.company} logo" class="w-full h-full object-cover rounded-full">
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-indigo-600">${job.title}</h3>
+                                    <p class="text-gray-500">${job.company}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-gray-500 text-sm space-x-4 mb-4">
+                                <span><i class="fa-solid fa-location-dot"></i> ${job.location}</span>
+                                <span><i class="fa-solid fa-clock"></i> ${job.type}</span>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-lg font-bold">Applicants: ${job.applicants.length}</p>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <button onclick="showApplicants('${job.id}')" class="w-full p-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-md text-sm">View Applicants</button>
+                                <button onclick="showEditJobPage('${job.id}')" class="w-full p-2 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600 transition-colors shadow-md text-sm">Edit Job</button>
+                            </div>
+                            <button onclick="handleDeleteJob(event, '${job.id}')" class="mt-2 w-full p-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors shadow-md text-sm">Delete Job</button>
+                        </div>
+                    </div>
+                `).join('') : `<p class="col-span-full text-center text-gray-500">You have not posted any jobs yet.</p>`;
+            }
+        };
+
+        /**
+         * Shows a modal with the list of applicants for a given job.
+         * @param {number} jobId - The ID of the job.
+         */
+        const showApplicants = async (jobId) => {
+            const job = allJobs.find(j => j.id === jobId);
+            if (job) {
+                const modal = document.getElementById('applicant-modal');
+                const title = document.getElementById('modal-title');
+                const list = document.getElementById('applicant-list');
+
+                modal.style.display = 'flex';
+                title.textContent = `Applicants for "${job.title}"`;
+                list.innerHTML = '<li class="text-gray-500">Loading applicants...</li>';
+
+                if (job.applicants.length > 0) {
+                    try { 
+                        const response = await fetch('/api/workers/get-by-emails', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ emails: job.applicants })
+                        });
+                        const applicantsData = await response.json();
+                        currentApplicants = applicantsData; // Store for download function
+
+                        if (response.ok) {
+                            list.innerHTML = applicantsData.map(user => {
+                                const application = job.applicants.find(app => app.email === user.email);
+                                const status = application ? application.status : 'N/A';
+                                const statusColor = {
+                                    'Applied': 'bg-blue-100 text-blue-800',
+                                    'Viewed': 'bg-gray-200 text-gray-800',
+                                    'Shortlisted': 'bg-green-100 text-green-800',
+                                    'Rejected': 'bg-red-100 text-red-800'
+                                }[status] || 'bg-gray-100 text-gray-800';
+
+                                return `
+                                <li class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-3 shadow-sm">
+                                    <div class="flex items-start space-x-4">
+                                        <img src="${user.profileImage || 'https://via.placeholder.com/150'}" alt="${user.name}" class="w-16 h-16 rounded-full object-cover border-2 border-indigo-200">
+                                        <div class="flex-grow">
+                                            <div class="flex justify-between items-center">
+                                                <p class="font-bold text-lg text-indigo-700">${user.name}</p>
+                                                <span class="px-3 py-1 text-xs font-semibold rounded-full ${statusColor}">${status}</span>
+                                            </div>
+                                            <div class="mt-2 pt-2 border-t border-gray-200 text-sm text-gray-600 space-y-1">
+                                                <p><i class="fa-solid fa-clock w-4 mr-2 text-gray-400"></i><strong>Hours:</strong> ${user.availability || 'Not specified'}</p>
+                                                <p><i class="fa-solid fa-indian-rupee-sign w-4 mr-2 text-gray-400"></i><strong>Rate:</strong> ${user.hourly_rate ? `₹${user.hourly_rate}/hour` : 'Not specified'}</p>
+                                                <p><i class="fa-solid fa-envelope w-4 mr-2 text-gray-400"></i><a href="mailto:${user.email}" class="text-blue-600 hover:underline">${user.email}</a></p>
+                                                ${user.profile_summary ? `
+                                                    <details class="mt-2 cursor-pointer">
+                                                        <summary class="font-semibold text-gray-700">View Profile Summary</summary>
+                                                        <p class="mt-1 pl-4 border-l-2 border-indigo-200 text-gray-600 whitespace-pre-wrap">${user.profile_summary}</p>
+                                                    </details>
+                                                ` : ''}
+                                                <div class="flex items-center justify-between mt-3">
+                                                ${user.hasResume && hasPermission('canViewApplicants') ? `
+                                                    <button onclick="downloadResume(event, '${user.email}')" class="px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-md hover:bg-blue-700 transition-colors"><i class="fa-solid fa-download mr-1"></i> Download Resume</button>
+                                                ` : ''}
+                                                    <select onchange="updateApplicationStatus(event, ${job.id}, '${user.email}')" class="p-1 border border-gray-300 rounded-md text-xs">
+                                                        <option value="" disabled selected>Change Status</option>
+                                                        <option value="Viewed" ${status === 'Viewed' ? 'selected' : ''}>Viewed</option>
+                                                        <option value="Shortlisted" ${status === 'Shortlisted' ? 'selected' : ''}>Shortlisted</option>
+                                                        <option value="Rejected" ${status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>`;
+                            }).join('');
+                        } else {
+                            list.innerHTML = `<li class="text-red-500">Failed to load applicant details.</li>`;
+                        }
+                    } catch (error) {
+                        console.error('Error fetching applicants:', error);
+                        list.innerHTML = `<li class="text-red-500">An error occurred.</li>`;
+                    }
+                } else {
+                    list.innerHTML = '<li class="text-gray-500">No applicants yet.</li>';
+                }
+            }
+        };
+
+        /**
+         * Updates the status of an application.
+         * @param {Event} event - The change event from the select dropdown.
+         * @param {number} jobId - The ID of the job.
+         * @param {string} applicantEmail - The email of the applicant.
+         */
+        const updateApplicationStatus = async (event, jobId, applicantEmail) => {
+            const newStatus = event.target.value;
+            if (!newStatus) return;
+
+            try {
+                const response = await fetch(`/api/jobs/${jobId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ applicantEmail, status: newStatus })
+                });
+
+                if (response.ok) {
+                    showMessage(`Status updated to "${newStatus}" for ${applicantEmail}`, 'success');
+                    // Refresh the modal to show the new status
+                    showApplicants(jobId);
+                } else {
+                    showMessage('Failed to update status.', 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred while updating status.', 'error');
+            }
+        };
+
+        /**
+         * Handles the deletion of a job.
+         * @param {Event} event - The click event.
+         * @param {number} jobId - The ID of the job to delete.
+         */
+        const handleDeleteJob = async (event, jobId) => { 
+            event.stopPropagation();
+            if (confirm('Are you sure you want to permanently delete this job? This action cannot be undone.')) {
+                try {
+                    const response = await fetch(`/api/jobs/${jobId}`, {
+                        method: 'DELETE',
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(data.msg, 'success');
+                        // Refresh the job provider's view by re-fetching all jobs and re-rendering
+                        await fetchAndRenderJobs(1); // Refetch jobs
+                        renderProviderJobsList(); // Re-render the provider's dashboard
+                    } else {
+                        showMessage(data.msg || 'Failed to delete job.', 'error');
+                    }
+                } catch (error) {
+                    showMessage('An error occurred while deleting the job.', 'error');
+                }
+            }
+        };
+
+        /**
+         * Fetches job data and shows the edit page.
+         * @param {number} jobId - The ID of the job to edit.
+         */
+        const showEditJobPage = async (jobId) => {
+            try {
+                const response = await fetch(`/api/jobs/${jobId}`);
+                if (!response.ok) throw new Error('Job not found');
+                const job = await response.json();
+
+                const container = document.getElementById('edit-job-page');
+                container.innerHTML = `
+                    <div class="container mx-auto px-4">
+                        <h1 class="text-4xl font-bold text-center mb-8">Edit Job</h1>
+                        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-2xl mx-auto">
+                            <form id="edit-job-form" class="space-y-6">
+                                <div>
+                                    <label for="edit-job-title" class="block text-gray-700 font-semibold mb-2">Job Title</label>
+                                    <input type="text" id="edit-job-title" value="${job.title}" required class="w-full p-3 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label for="edit-job-company" class="block text-gray-700 font-semibold mb-2">Company</label>
+                                    <input type="text" id="edit-job-company" value="${job.company}" required class="w-full p-3 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label for="edit-job-location" class="block text-gray-700 font-semibold mb-2">Location</label>
+                                    <input type="text" id="edit-job-location" value="${job.location}" required class="w-full p-3 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label for="edit-job-description" class="block text-gray-700 font-semibold mb-2">Description</label>
+                                    <textarea id="edit-job-description" rows="5" required class="w-full p-3 border border-gray-300 rounded-lg">${job.description}</textarea>
+                                </div>
+                                <button type="submit" class="w-full p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('edit-job-form').addEventListener('submit', (e) => handleEditJobSubmit(e, job.id));
+                showPage('edit-job-page');
+
+            } catch (error) {
+                showMessage('Could not load job for editing.', 'error');
+            }
+        };
+
+        /**
+         * Handles the submission of the edit job form.
+         * @param {Event} event - The form submission event.
+         * @param {string} jobId - The ID of the job being edited.
+         */
+        const handleEditJobSubmit = async (event, jobId) => {
+            event.preventDefault();
+            const updatedJobData = {
+                title: document.getElementById('edit-job-title').value,
+                company: document.getElementById('edit-job-company').value,
+                location: document.getElementById('edit-job-location').value,
+                description: document.getElementById('edit-job-description').value,
+            };
+
+            const response = await fetch(`/api/jobs/${jobId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedJobData)
+            });
+
+            if (response.ok) {
+                showMessage('Job updated successfully!', 'success');
+                await fetchAndRenderJobs(1); // Refresh job lists
+                showPage('home-page'); // Navigate back to provider dashboard
+            } else {
+                showMessage('Failed to update job.', 'error');
+            }
+        };
+
+        const downloadResume = (event, applicantEmail) => {
+             event.stopPropagation(); // Prevent any parent click handlers from firing
+             // This function now relies on the data already fetched for the modal.
+             const applicantData = currentApplicants.find(u => u.email === applicantEmail);
+ 
+             if (!applicantData || !applicantData.hasResume || !applicantData.resumeData) {
+                 showMessage('Resume not found for this applicant.', 'error');
+                 return;
+             }
+ 
+             let fileName = `${applicantData.name.replace(/\s/g, '_')}_resume.txt`;
+             let dataUrl = '';
+ 
+             if (applicantData.resumeData.type === 'pdf') {
+                 dataUrl = applicantData.resumeData.dataUrl;
+                 fileName = applicantData.resumeData.fileName || `${applicantData.name.replace(/\s/g, '_')}_resume.pdf`;
+             } else {
+                 // Assume it's a text-based resume from the builder
+                 const resumeText = `Name: ${applicantData.resumeData.contact.name}\nEmail: ${applicantData.resumeData.contact.email}\nPhone: ${applicantData.resumeData.contact.phone}\n\nSummary:\n${applicantData.resumeData.summary}`;
+                 const blob = new Blob([resumeText], { type: 'text/plain' });
+                 dataUrl = URL.createObjectURL(blob);
+             }
+ 
+             const a = document.createElement('a');
+             a.href = dataUrl;
+             a.download = fileName;
+             document.body.appendChild(a);
+             a.click();
+             document.body.removeChild(a);
+             if (applicantData.resumeData.type !== 'pdf') URL.revokeObjectURL(dataUrl);
+             showMessage(`Downloading ${fileName}...`, 'success');
+        };
+
+        /**
+         * Closes a modal.
+         * @param {string} modalId The ID of the modal to close.
+         */
+        const closeModal = (modalId) => {
+            document.getElementById(modalId).style.display = 'none';
+        };
+
+        /**
+         * Renders the profile page dynamically.
+         */ 
+        const renderProfilePage = () => {
+            const profilePage = document.getElementById('profile-page');
+            const user = loggedInUser;
+            if (!user.email) {
+                profilePage.innerHTML = `
+                    <div class="container mx-auto px-4 mt-10">
+                        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 text-center max-w-2xl mx-auto">
+                            <h2 class="text-3xl font-bold text-red-600 mb-4">Access Denied</h2>
+                            <p class="text-lg text-gray-700 mb-6">You must be logged in to view your profile.</p>
+                            <a href="#" class="inline-block p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md" data-page="login">Log In Now</a>
+                        </div>
+                    </div>
+                `;
+                addNavigationListeners(); // Re-attach listeners for the "Log In Now" button
+                return;
+            }
+
+            const hasProfile = !!user.profile_summary;
+            const hasResume = user.hasResume;
+            let profileContent = hasProfile
+                ? `<p class="text-lg leading-relaxed text-gray-700 whitespace-pre-wrap">${user.profile_summary}</p>`
+                : `<p class="text-gray-500 italic">No professional profile added yet.</p>`;
+
+            let resumeContent = hasResume
+                ? `<a href="#" onclick="showPage('resume-builder-page')" class="text-blue-600 hover:underline">
+                        <i class="fa-solid fa-file-pdf"></i> View my Resume
+                    </a>`
+                : `<p class="text-gray-500 italic">No resume uploaded. Create or upload one now to apply for jobs.</p>`;
+
+            profilePage.innerHTML = `
+                <div class="container mx-auto px-4 mt-10">
+                    <h1 class="text-4xl font-bold text-center mb-8">My Profile</h1>
+                    <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-4xl mx-auto">
+                        <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8 border-b pb-8">
+                            <div class="relative flex-shrink-0 w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-5xl text-gray-500">
+                                <img id="profile-page-image" src="${user.profileImage || 'https://via.placeholder.com/150'}" alt="Profile" class="w-full h-full object-cover rounded-full">
+                                <label for="profile-image-upload" class="absolute bottom-0 right-0 bg-indigo-600 text-white p-1 rounded-full cursor-pointer hover:bg-indigo-700">
+                                    <i class="fa-solid fa-camera text-sm"></i>
+                                </label>
+                                <input type="file" id="profile-image-upload" class="hidden" accept="image/*" onchange="handleProfileImageUpload(event)">
+                            </div>
+                            <div class="text-center sm:text-left">
+                                <h2 class="text-3xl font-bold text-indigo-600">${user.name}</h2>
+                                <p class="text-lg text-gray-600">${user.email}</p>
+                                <span class="inline-block mt-2 px-3 py-1 text-sm font-semibold rounded-full ${user.role === 'job-seeker' ? 'bg-indigo-100 text-indigo-800' : 'bg-green-100 text-green-800'}">
+                                    ${user.role === 'job-seeker' ? 'Job Seeker' : 'Job Provider'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-10 border-b pb-8">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-2xl font-bold text-gray-800">Professional Profile</h3>
+                                <div class="space-x-2">
+                                    <button onclick="showProfileEditorModal()" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
+                                        <i class="fa-solid fa-edit"></i> ${hasProfile ? 'Update Profile' : 'Add Profile'}
+                                    </button>
+                                    ${hasProfile ? `<button onclick="deleteProfile()" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors">
+                                        <i class="fa-solid fa-trash"></i> Delete
+                                    </button>` : ''}
+                                </div>
+                            </div>
+                            ${profileContent}
+                        </div>
+
+                        ${user.role === 'job-seeker' ? `
+                            <div class="mb-10 border-b pb-8">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-2xl font-bold text-gray-800">Resume</h3>
+                                    <button onclick="showPage('resume-builder-page')" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
+                                        <i class="fa-solid fa-file-arrow-up"></i> ${hasResume ? 'Update Resume' : 'Create/Upload Resume'}
+                                    </button>
+                                </div>
+                                ${resumeContent}
+                            </div>
+                        ` : ''}
+                        
+                        ${user.role === 'job-seeker' ? `
+                        <div id="job-seeker-settings">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Availability & Rate</h3>
+                            <form id="availability-form" class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="working-hours" class="block text-gray-700 font-semibold mb-2">Working Hours</label>
+                                        <input type="text" id="working-hours" name="working-hours" value="${user.availability || ''}" placeholder="e.g., 9 AM - 5 PM, Mon-Fri"
+                                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                                    </div>
+                                    <div>
+                                        <label for="hourly-rate" class="block text-gray-700 font-semibold mb-2">Per Hour Rate (₹)</label>
+                                        <input type="number" id="hourly-rate" name="hourly-rate" value="${user.hourly_rate || ''}" placeholder="e.g., 150"
+                                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                                    </div>
+                                </div>
+                                <div class="flex justify-end mt-4">
+                                    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
+                                        Save Settings
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            if (loggedInUser.role === 'job-seeker') {
+                addAvailabilityFormListener();
+            }
+        };
+
+        const handleProfileImageUpload = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageUrl = e.target.result; // This is a base64 string
+                    if (loggedInUser) {
+                        // In a real app, you'd upload this to a server/S3 and get a URL.
+                        // For now, we'll save the base64 string to the user object and database.
+                        loggedInUser.profileImage = imageUrl; // Update local object
+                        document.getElementById('profile-page-image').src = imageUrl; // Update UI
+
+                        // Now, send this to the backend to save.
+                        // We'll add 'profileImage' to the existing '/api/workers/profile' endpoint.
+                        fetch('/api/workers/profile', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: loggedInUser.email, profileImage: imageUrl })
+                        }).then(res => res.json()).then(data => {
+                            if (data.msg === 'Profile updated successfully') {
+                                showMessage('Profile image updated!', 'success');
+                            } else {
+                                showMessage('Failed to save image.', 'error');
+                            }
+                        });
+                    }
+                    updateUIForRole(false); // Re-render UI to update navbar image
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        const addAvailabilityFormListener = () => {
+            const form = document.getElementById('availability-form');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const workingHours = document.getElementById('working-hours').value;
+                    const hourlyRate = document.getElementById('hourly-rate').value;
+                    if (!loggedInUser.email) {
+                        showMessage('User not found. Please log in again.', 'error');
+                        return;
+                    }
+
+                    // Send data to the backend
+                    fetch('/api/workers/profile', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: loggedInUser.email, 
+                            availability: workingHours, // Match schema
+                            hourly_rate: hourlyRate,   // Match schema
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.msg === 'Profile updated successfully') {
+                            // Update local user object upon success
+                            loggedInUser.availability = workingHours;
+                            loggedInUser.hourly_rate = hourlyRate;
+                            showMessage('Profile settings saved successfully!', 'success');
+                        } else {
+                            showMessage(data.msg || 'Failed to save settings.', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error saving profile:', err);
+                        showMessage('An error occurred while saving.', 'error');
+                    });
+                });
+            }
+        };
+
+        const showProfileEditorModal = () => {
+            const modal = document.getElementById('profile-modal');
+            const profileTextarea = document.getElementById('profile-text');
+            profileTextarea.value = loggedInUser.profile_summary || '';
+            modal.style.display = 'flex';
+        };
+
+        const saveProfile = (e) => {
+            e.preventDefault();
+            const profileText = document.getElementById('profile-text').value.trim();
+            if (loggedInUser) {
+                fetch('/api/workers/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: loggedInUser.email, profile_summary: profileText })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.msg === 'Profile updated successfully') {
+                        loggedInUser.profile_summary = profileText; // Update local object
+                        showMessage('Profile summary saved successfully!', 'success');
+                        closeModal('profile-modal');
+                        renderProfilePage(); // Re-render to show the new summary
+                    } else {
+                        showMessage('Failed to save profile summary.', 'error');
+                    }
+                }).catch(err => {
+                    console.error('Error saving profile summary:', err);
+                    showMessage('An error occurred.', 'error');
+                });
+            }
+        };
+
+        const deleteProfile = () => {
+            if (confirm('Are you sure you want to delete your professional profile?')) {
+                if (loggedInUser) {
+                    // To delete, we just save an empty string to the database
+                    loggedInUser.profile_summary = null;
+                    saveProfile({ preventDefault: () => {} }); // Reuse saveProfile logic
+                }
+            }
+        };
+
+        /**
+         * Fetches and renders the jobs a user has applied for.
+         */
+        const renderMyApplicationsPage = async () => {
+            let allAppliedJobs = []; // To store the full list of jobs
+            const container = document.getElementById('my-applications-page');
+            if (!loggedInUser.email) {
+                container.innerHTML = `<p class="text-center text-red-500">You must be logged in to see your applications.</p>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-center mb-8">My Job Applications</h1>
+                    <div class="bg-white p-4 rounded-xl shadow-md mb-6 flex flex-col md:flex-row items-center gap-4">
+                        <div class="w-full md:w-1/2">
+                            <input type="text" id="application-search-input" placeholder="Search by job title or company..." class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        </div>
+                        <div class="w-full md:w-1/2">
+                            <select id="application-status-filter" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                                <option value="All">Filter by Status (All)</option>
+                                <option value="Applied">Applied</option>
+                                <option value="Viewed">Viewed</option>
+                                <option value="Shortlisted">Shortlisted</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="my-applications-list" class="space-y-6">
+                        <p class="text-center text-gray-500">Loading your applications...</p>
+                    </div>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`/api/jobs/applied/${loggedInUser.email}`);
+                allAppliedJobs = await response.json();
+
+                const displayFilteredApplications = () => {
+                    const listContainer = document.getElementById('my-applications-list');
+                    const searchTerm = document.getElementById('application-search-input').value.toLowerCase();
+                    const statusFilter = document.getElementById('application-status-filter').value;
+
+                    const filteredJobs = allAppliedJobs.filter(job => {
+                        const application = job.applicants.find(app => app.email === loggedInUser.email);
+                        const status = application ? application.status : 'N/A';
+
+                        const matchesSearch = job.title.toLowerCase().includes(searchTerm) || job.company.toLowerCase().includes(searchTerm);
+                        const matchesStatus = statusFilter === 'All' || status === statusFilter;
+
+                        return matchesSearch && matchesStatus;
+                    });
+
+                    if (filteredJobs.length > 0) {
+                        listContainer.innerHTML = filteredJobs.map(job => {
+                            const application = job.applicants.find(app => app.email === loggedInUser.email);
+                            const status = application ? application.status : 'N/A';
+                            const statusColor = {
+                                'Applied': 'bg-blue-100 text-blue-800',
+                                'Viewed': 'bg-gray-200 text-gray-800',
+                                'Shortlisted': 'bg-green-100 text-green-800',
+                                'Rejected': 'bg-red-100 text-red-800'
+                            }[status] || 'bg-gray-100 text-gray-800';
+
+                            return `
+                                <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 hover:shadow-lg transition-shadow">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="text-xl font-bold text-indigo-600">${job.title}</h3>
+                                            <p class="text-gray-600">${job.company} - ${job.location}</p>
+                                            <p class="text-sm text-gray-500 mt-1">Posted on: ${new Date(job.posted).toLocaleDateString()}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full ${statusColor}">${status}</span>
+                                            <button onclick="showJobDetail(${job.id})" class="mt-2 text-sm text-indigo-600 hover:underline">View Job Details</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        listContainer.innerHTML = `<p class="text-center text-gray-600 bg-gray-50 py-10 rounded-xl">No applications match your criteria.</p>`;
+                    }
+                };
+
+                // Initial display and add event listeners
+                displayFilteredApplications();
+                document.getElementById('application-search-input').addEventListener('input', displayFilteredApplications);
+                document.getElementById('application-status-filter').addEventListener('change', displayFilteredApplications);
+
+            } catch (error) {
+                document.getElementById('my-applications-list').innerHTML = `<p class="text-center text-red-500">Could not load your applications.</p>`;
+            }
+        };
+
+        /**
+         * Toggles a job as saved or unsaved for the current user.
+         * @param {Event} event - The click event.
+         * @param {string} jobId - The ID of the job to save/unsave.
+         */
+        const handleSaveJob = async (event, jobId) => {
+            event.stopPropagation();
+            if (!loggedInUser.email) {
+                showMessage('You must be logged in to save jobs.', 'error');
+                return;
+            }
+
+            const buttonIcon = event.currentTarget.querySelector('i');
+            const isSaved = loggedInUser.savedJobs.includes(jobId);
+
+            try {
+                const response = await fetch('/api/workers/save-job', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: loggedInUser.email, jobId })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    loggedInUser.savedJobs = data.worker.savedJobs;
+                    showMessage(data.message, 'success');
+                    buttonIcon.classList.toggle('text-amber-500', !isSaved);
+                } else {
+                    showMessage(data.msg || 'Failed to update saved jobs.', 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred.', 'error');
+            }
+        };
+
+        /**
+         * Fetches and renders the user's saved jobs.
+         */
+        const renderSavedJobsPage = async () => {
+            const container = document.getElementById('saved-jobs-page');
+            container.innerHTML = `<div class="container mx-auto px-4"><h1 class="text-4xl font-bold text-center mb-8">My Saved Jobs</h1><div id="saved-jobs-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"><p>Loading...</p></div></div>`;
+            const listContainer = document.getElementById('saved-jobs-list');
+
+            const response = await fetch(`/api/workers/saved-jobs/${loggedInUser.email}`);
+            const savedJobs = await response.json();
+
+            listContainer.innerHTML = savedJobs.length > 0 ? savedJobs.map(createJobCard).join('') : `<p class="col-span-full text-center text-gray-500">You have no saved jobs.</p>`;
+        };
+
+        /**
+         * Updates the navigation and content based on the user's role.
+         */
+        const updateUIForRole = (shouldNavigate = true) => {
+            const navLogin = document.getElementById('nav-login');
+            const navJobs = document.getElementById('nav-jobs');
+            const navPostJob = document.getElementById('nav-post-job');
+            const navProfile = document.getElementById('nav-profile');
+            const navSavedJobs = document.getElementById('nav-saved-jobs');
+            const navMyApplications = document.getElementById('nav-my-applications');
+            const notificationToggle = document.getElementById('notification-toggle-icon');
+
+            if (currentUserRole === 'job-seeker') {
+                navLogin.classList.add('hidden');
+                document.getElementById('nav-logout').classList.remove('hidden');
+                document.getElementById('nav-profile-img-container').classList.remove('hidden');
+                document.getElementById('nav-profile-img').src = loggedInUser.profileImage || 'https://via.placeholder.com/150';
+                navJobs.classList.remove('hidden');
+                navPostJob.classList.add('hidden');
+                navProfile.classList.add('hidden'); // Hide text link
+                navSavedJobs.classList.remove('hidden');
+                navMyApplications.classList.remove('hidden');
+                notificationToggle.classList.remove('hidden');
+                renderJobSeekerDashboard();
+            } else if (currentUserRole === 'job-provider') {
+                navLogin.classList.add('hidden');
+                document.getElementById('nav-logout').classList.remove('hidden');
+                document.getElementById('nav-profile-img-container').classList.remove('hidden');
+                document.getElementById('nav-profile-img').src = loggedInUser.profileImage || 'https://via.placeholder.com/150';
+                navJobs.classList.add('hidden');
+                navPostJob.classList.remove('hidden');
+                navProfile.classList.add('hidden'); // Hide text link
+                navSavedJobs.classList.add('hidden');
+                navMyApplications.classList.add('hidden');
+                notificationToggle.classList.remove('hidden');
+                renderJobProviderUI();
+            } else {
+                navLogin.classList.remove('hidden');
+                document.getElementById('nav-logout').classList.add('hidden');
+                document.getElementById('nav-profile-img-container').classList.add('hidden');
+                navJobs.classList.remove('hidden');
+                navPostJob.classList.add('hidden');
+                navProfile.classList.add('hidden'); // Hide text link when logged out
+                navSavedJobs.classList.add('hidden');
+                navMyApplications.classList.add('hidden');
+                notificationToggle.classList.remove('hidden');
+                // Render default home page
+                renderJobSeekerDashboard();
+            }
+            if(shouldNavigate) {
+                showPage('home-page');
+            }
+            updateNotificationUI();
+            if (loggedInUser.role === 'job-seeker') {
+                addAvailabilityFormListener();
+            }
+        };
+
+        /**
+         * Adds the event listener for the search form.
+         */
+        const addSearchFormListener = () => {
+            // This function now handles passing search terms to the paginated view.
+            // It no longer performs client-side filtering.
+            const searchForm = document.getElementById('search-form');
+            if (searchForm) {
+                searchForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const keyword = document.getElementById('search-keyword').value.toLowerCase();
+                    const location = document.getElementById('search-location').value.toLowerCase();
+
+                    fetchAndRenderJobs(1, { keyword, location });
+                    showPage('job-listings-page');
+                });
+            }
+        };
+
+        /**
+         * Adds the event listener for the post job form.
+         */
+        const addPostJobListener = () => {
+            const postJobForm = document.getElementById('post-job-form');
+            if (postJobForm) {
+                postJobForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+
+                    const fileInput = document.getElementById('job-image');
+                    const file = fileInput.files[0];
+                    let imageUrl = '';
+
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        imageUrl = event.target.result;
+                        createNewJob(imageUrl);
+                    };
+
+                    if (file) {
+                        reader.readAsDataURL(file);
+                    } else {
+                        // Use a default image if no file is uploaded
+                        createNewJob(getDefaultJobImage());
+                    }
+                });
+            }
+        };
+
+        const createNewJob = async (imageUrl) => {
+            const newJob = {
+                title: document.getElementById('job-title').value,
+                company: document.getElementById('job-company').value,
+                location: document.getElementById('job-location').value,
+                description: document.getElementById('job-description').value,
+                imageUrl: imageUrl,
+                postedBy: loggedInUser.email // Associate job with the provider
+            };
+
+            try {
+                const response = await fetch('/api/jobs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }, // No auth headers needed with cookies
+                    body: JSON.stringify(newJob)
+                });
+
+                if (response.ok) {
+                    showMessage('Job posted successfully!', 'success');
+                    document.getElementById('post-job-form').reset();
+                    // Re-fetch jobs to update the UI
+                    await fetchAndRenderJobs(1);
+                    renderProviderJobsList(); // Update the provider's dashboard
+                } else {
+                    showMessage('Failed to post job.', 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred while posting the job.', 'error');
+            }
+        };
+
+        /**
+         * Adds the event listener for the description generator button.
+         */
+        const addDescriptionGeneratorListener = () => {
+            const generateBtn = document.getElementById('generate-description-btn');
+            if (generateBtn) {
+                generateBtn.addEventListener('click', async () => {
+                    const title = document.getElementById('job-title').value;
+                    const company = document.getElementById('job-company').value;
+                    const descriptionEl = document.getElementById('job-description');
+
+                    if (!title) {
+                        showMessage('Please enter a job title first.', 'error');
+                        return;
+                    }
+
+                    // Show loading state
+                    const originalText = generateBtn.textContent;
+                    generateBtn.textContent = 'Generating...';
+                    generateBtn.disabled = true;
+
+                    // Construct the prompt for the Gemini API
+                    const prompt = `Generate a professional job description for the role of "${title}" at the company "${company}". The description should be well-structured and include sections like "About the Role", "Responsibilities", and "Qualifications".`;
+
+                    const apiKey = ""; // Leave as-is, the environment will provide it
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                    try {
+                        let retries = 0;
+                        const maxRetries = 5;
+                        let response;
+                        let json;
+
+                        while (retries < maxRetries) {
+                            response = await fetch(apiUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    contents: [{
+                                        parts: [{ text: prompt }]
+                                    }]
+                                }),
+                            });
+
+                            if (response.status === 429) {
+                                const delay = Math.pow(2, retries) * 1000;
+                                await new Promise(resolve => setTimeout(resolve, delay));
+                                retries++;
+                            } else {
+                                json = await response.json();
+                                break;
+                            }
+                        }
+
+                        if (!response.ok) {
+                            throw new Error(json.error.message);
+                        }
+
+                        const generatedText = json.candidates[0].content.parts[0].text;
+                        descriptionEl.value = generatedText;
+                        showMessage('Description generated successfully!', 'success');
+
+                    } catch (error) {
+                        console.error('API Error:', error);
+                        showMessage('Failed to generate description. Please try again.', 'error');
+                    } finally {
+                        // Restore button state
+                        generateBtn.textContent = originalText;
+                        generateBtn.disabled = false;
+                    }
+                });
+            }
+        };
+
+
+        /**
+         * Draws an animated graph on a canvas to visualize the process.
+         * @param {string} canvasId - The ID of the canvas element.
+         */
+        const drawProcessGraph = (canvasId) => {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas size based on its container
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = 150;
+
+            const nodes = [
+                { id: 1, text: 'Create an Account', x: canvas.width * 0.15, y: canvas.height / 2 },
+                { id: 2, text: 'Find a Job', x: canvas.width * 0.5, y: canvas.height * 0.25 },
+                { id: 3, text: 'Apply for Jobs', x: canvas.width * 0.85, y: canvas.height / 2 },
+                { id: 4, text: 'Post a Job', x: canvas.width * 0.5, y: canvas.height * 0.75 }
+            ];
+
+            const links = [
+                { start: 1, end: 2, duration: 800, delay: 500 },
+                { start: 2, end: 3, duration: 800, delay: 1500 },
+                { start: 1, end: 4, duration: 800, delay: 500 },
+                { start: 4, end: 3, duration: 800, delay: 1500 }
+            ];
+
+            const nodeRadius = 30;
+            const nodeColor = '#3b82f6'; // Indigo 600
+            const nodeTextColor = '#fff';
+            const linkColor = '#60a5fa'; // Indigo 400
+
+            let animationFrameId;
+            let startTime = null;
+
+            function drawNode(node, isHighlighted = false) {
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, nodeRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = isHighlighted ? '#1d4ed8' : nodeColor; // Darker blue for highlight
+                ctx.fill();
+                ctx.fillStyle = nodeTextColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = 'bold 10px Inter';
+                wrapText(ctx, node.text, node.x, node.y, nodeRadius * 1.5, 10);
+            }
+
+            function drawLink(link, progress) {
+                const startNode = nodes.find(n => n.id === link.start);
+                const endNode = nodes.find(n => n.id === link.end);
+
+                if (!startNode || !endNode) return;
+
+                ctx.beginPath();
+                ctx.moveTo(startNode.x, startNode.y);
+
+                const currentX = startNode.x + (endNode.x - startNode.x) * progress;
+                const currentY = startNode.y + (endNode.y - startNode.y) * progress;
+
+                ctx.lineTo(currentX, currentY);
+                ctx.strokeStyle = linkColor;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Draw arrowhead at the end of the line
+                if (progress > 0.9) {
+                    const angle = Math.atan2(endNode.y - startNode.y, endNode.x - startNode.x);
+                    drawArrowhead(ctx, currentX, currentY, angle, linkColor);
+                }
+            }
+
+            function drawArrowhead(ctx, x, y, angle, color) {
+                const arrowSize = 8;
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-arrowSize, -arrowSize / 2);
+                ctx.lineTo(-arrowSize, arrowSize / 2);
+                ctx.closePath();
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function wrapText(context, text, x, y, maxWidth, lineHeight) {
+                const words = text.split(' ');
+                let line = '';
+                let lineCount = 0;
+
+                for (let n = 0; n < words.length; n++) {
+                    const testLine = line + words[n] + ' ';
+                    const metrics = context.measureText(testLine);
+                    const testWidth = metrics.width;
+                    if (testWidth > maxWidth && n > 0) {
+                        context.fillText(line.trim(), x, y - (words.length > 1 ? lineHeight / 2 : 0) + (lineCount * lineHeight));
+                        line = words[n] + ' ';
+                        lineCount++;
+                    } else {
+                        line = testLine;
+                    }
+                }
+                context.fillText(line.trim(), x, y - (words.length > 1 ? lineHeight / 2 : 0) + (lineCount * lineHeight));
+            }
+
+            function animate(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const elapsed = timestamp - startTime;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw static nodes
+                drawNode(nodes.find(n => n.id === 1));
+                drawNode(nodes.find(n => n.id === 3));
+                drawNode(nodes.find(n => n.id === 2));
+                drawNode(nodes.find(n => n.id === 4));
+
+                // Draw and animate links
+                links.forEach(link => {
+                    const linkElapsed = elapsed - link.delay;
+                    if (linkElapsed > 0) {
+                        const progress = Math.min(linkElapsed / link.duration, 1);
+                        drawLink(link, progress);
+                    }
+                });
+
+                // Request next frame if animation is not complete
+                if (elapsed < links[links.length - 1].delay + links[links.length - 1].duration) {
+                    animationFrameId = requestAnimationFrame(animate);
+                }
+            }
+
+            // Start the animation
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            animationFrameId = requestAnimationFrame(animate);
+
+            // Handle window resize to redraw graph
+            window.addEventListener('resize', () => {
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                }
+                canvas.width = container.clientWidth;
+                canvas.height = 150;
+                drawProcessGraph(canvasId);
+            });
+        };
+
+        // --- Image Slider Logic ---
+        let currentImageIndex = 0;
+        let sliderInterval;
+
+        const setupImageSlider = () => {
+            const images = document.querySelectorAll('.slider-image');
+            const dots = document.querySelectorAll('.slider-dots .dot');
+            const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
+
+            if (images.length === 0) return;
+
+            const showImage = (index) => {
+                images.forEach(img => img.classList.remove('active'));
+                dots.forEach(dot => dot.classList.remove('active'));
+                images[index].classList.add('active');
+                dots[index].classList.add('active');
+            };
+
+            const nextImage = () => {
+                currentImageIndex = (currentImageIndex + 1) % images.length;
+                showImage(currentImageIndex);
+            };
+
+            const prevImage = () => {
+                currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+                showImage(currentImageIndex);
+            };
+
+            // Initial display
+            showImage(currentImageIndex);
+
+            // Manual controls
+            nextBtn.addEventListener('click', () => {
+                clearInterval(sliderInterval);
+                nextImage();
+                startSlider();
+            });
+            prevBtn.addEventListener('click', () => {
+                clearInterval(sliderInterval);
+                prevImage();
+                startSlider();
+            });
+
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    clearInterval(sliderInterval);
+                    currentImageIndex = index;
+                    showImage(currentImageIndex);
+                    startSlider();
+                });
+            });
+
+            const startSlider = () => {
+                sliderInterval = setInterval(nextImage, 5000); // Change image every 5 seconds
+            };
+
+            startSlider();
+        };
+
+        // --- Event Listeners and Initial Setup ---
+
+        /**
+         * Renders pagination controls.
+         * @param {number} totalPages - The total number of pages.
+         * @param {number} currentPage - The current active page.
+         */
+        const renderPaginationControls = (totalPages, currentPage) => {
+            const container = document.getElementById('pagination-container'); 
+            if (!container) return;
+
+            let paginationHTML = '';
+            if (totalPages > 1) {
+                paginationHTML += `<nav aria-label="Page navigation"><ul class="inline-flex items-center -space-x-px">`;
+
+                // Previous button
+                paginationHTML += `<li><a href="#" onclick="fetchAndRenderJobs(${currentPage - 1})" class="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}">Previous</a></li>`;
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    const activeClasses = 'z-10 px-3 py-2 leading-tight text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700';
+                    const defaultClasses = 'px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700';
+                    paginationHTML += `<li><a href="#" onclick="fetchAndRenderJobs(${i})" class="${i === currentPage ? activeClasses : defaultClasses}">${i}</a></li>`;
+                }
+
+                // Next button
+                paginationHTML += `<li><a href="#" onclick="fetchAndRenderJobs(${currentPage + 1})" class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}">Next</a></li>`;
+
+                paginationHTML += `</ul></nav>`;
+            }
+            container.innerHTML = paginationHTML;
+        };
+
+        /**
+         * Fetches jobs for a specific page and renders them.
+         * Now accepts search parameters.
+         * @param {number} page - The page number to fetch.
+         * @param {object} searchParams - An object with keyword and location.
+         */
+        const fetchAndRenderJobs = async (page = 1, searchParams = {}) => {
+            const { keyword = '', location = '' } = searchParams; 
+            const sortBy = document.getElementById('sort-by-select')?.value || 'date_desc';
+            const listContainer = document.getElementById('all-jobs-container');
+            const paginationContainer = document.getElementById('pagination-container');
+            
+            listContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">Loading jobs...</p>';
+            paginationContainer.innerHTML = '';
+
+            try {
+                const apiUrl = `/api/jobs?page=${page}&limit=9&keyword=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}&sortBy=${sortBy}`;
+                const response = await fetch(apiUrl);
+                if (response.ok) {
+                    const data = await response.json();
+                    allJobs = data.jobs; // Update the global job list for the current view
+                    renderJobs(allJobs, 'all-jobs-container'); // This will now render the fetched page of jobs
+                    renderPaginationControls(data.totalPages, data.currentPage);
+                } else {
+                    listContainer.innerHTML = '<p class="text-center text-red-500 col-span-full">Could not load job data.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching jobs:', error);
+                listContainer.innerHTML = '<p class="text-center text-red-500 col-span-full">An error occurred while fetching jobs.</p>';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // --- NEW: Check for active session on page load ---
+            try {
+                const response = await fetch('/api/auth/me');
+                if (response.ok) {
+                    const user = await response.json();
+                    if (user) {
+                        // User is logged in via session
+                        currentUserRole = user.role;
+                        loggedInUser = { ...user };
+                        showMessage(`Welcome back, ${user.name}!`, 'success');
+                        updateUIForRole();
+                    }
+                }
+            } catch (error) {
+                console.log('No active session found.');
+            }
+
+            // Fetch initial data for home page (featured jobs) and job listings (page 1)
+            await fetchAndRenderJobs(1); // Fetch the first page of jobs for the listings page
+            const featuredJobs = allJobs.slice(0, 3); // Take the first 3 from the fetched jobs
+
+            // Add event listener for the sort dropdown
+            const sortSelect = document.getElementById('sort-by-select');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', () => fetchAndRenderJobs(1));
+            }
+
+            const addNavigationListeners = () => {
+                // Handle navigation clicks for any element with data-page
+                document.querySelectorAll('[data-page]').forEach(link => {
+                    // Remove old listener to prevent duplicates
+                    link.replaceWith(link.cloneNode(true));
+                });
+
+                document.querySelectorAll('[data-page]').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const pageTarget = e.currentTarget.getAttribute('data-page');
+                        const pageId = pageTarget + '-page';
+
+                        if (pageTarget === 'post-job' && currentUserRole === 'job-provider') {
+                            showPage('home-page');
+                            renderJobProviderUI();
+                        } else if (pageTarget === 'home') {
+                            updateUIForRole();
+                        } else if (pageTarget === 'resume-builder') {
+                            if (loggedInUser && loggedInUser.hasResume) {
+                                showUploadedResumeSection(loggedInUser.resumeData);
+                            } else {
+                                showResumeBuilderSection();
+                            }
+                            showPage(pageId);
+                        } else if (pageTarget === 'job-listings') {
+                            fetchAndRenderJobs(1); // Always fetch page 1 when navigating to listings
+                            showPage(pageId);
+                        } else {
+                            showPage(pageId);
+                        }
+                    });
+                });
+            };
+            window.addNavigationListeners = addNavigationListeners;
+            addNavigationListeners();
+
+            // Handle logout
+            document.getElementById('nav-logout').addEventListener('click', (e) => {
+                e.preventDefault();
+                fetch('/api/workers/logout', { method: 'POST' }).then(() => {
+                    currentUserRole = null;
+                    loggedInUser = { name: null, email: null, role: null, hasResume: false, resumeData: null, profile: null, profileImage: null, workingHours: null, hourlyRate: null };
+                    showMessage('Logged out successfully!');
+                    updateUIForRole();
+                });
+            });
+
+            // Set up initial UI state
+            updateUIForRole();
+
+            // Handle contact form submission
+            const contactForm = document.getElementById('contact-form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    showMessage('Your message has been sent successfully!');
+                    contactForm.reset();
+                });
+            }
+
+            // Handle login form submission
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) { 
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const loginData = {
+                        email: document.getElementById('login-email').value,
+                        password: document.getElementById('login-password').value,
+                        role: document.getElementById('login-role').value
+                    };
+
+                    try {
+                        const response = await fetch('/api/workers/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(loginData)
+                        });
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            currentUserRole = data.user.role;
+                            loggedInUser = { ...data.user };
+                            showMessage('Login successful!', 'success');
+                            loginForm.reset();
+                            updateUIForRole();
+                        } else {
+                            showMessage(data.msg || 'Login failed.', 'error');
+                        }
+                    } catch (error) {
+                        showMessage('An error occurred during login.', 'error');
+                    }
+                });
+            }
+
+            // Handle signup form submission
+            const signupForm = document.getElementById('signup-form');
+            if (signupForm) { 
+                signupForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const signupData = {
+                        name: document.getElementById('signup-name').value,
+                        email: document.getElementById('signup-email').value,
+                        password: document.getElementById('signup-password').value,
+                        role: document.getElementById('signup-role').value,
+                        hasResume: false,
+                        resumeData: null, // Will be set later
+                        profile_summary: null, // Initialize as null
+                        profileImage: null,
+                        availability: null, // Initialize as null
+                        hourly_rate: null // Initialize as null
+                    };
+
+                    try {
+                        const response = await fetch('/api/workers/register', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(signupData)
+                        });
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            // Automatically log the user in after successful registration
+                            const loginResponse = await fetch('/api/workers/login', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    email: signupData.email,
+                                    password: signupData.password,
+                                    role: signupData.role
+                                })
+                            });
+                            const loginData = await loginResponse.json();
+                            if (loginResponse.ok) {
+                                currentUserRole = loginData.user.role;
+                                loggedInUser = { ...loginData.user };
+                                showMessage('Account created successfully! You are now logged in.', 'success');
+                                signupForm.reset();
+                                updateUIForRole();
+                            }
+                        } else {
+                            showMessage(data.msg || 'Signup failed.', 'error');
+                        }
+                    } catch (err) {
+                        console.error('Signup error:', err);
+                        showMessage('An error occurred during signup.', 'error');
+                    }
+                });
+            }
+
+            // Handle resume builder form submission
+            const resumeBuilderForm = document.getElementById('resume-builder-form');
+            if (resumeBuilderForm) {
+                resumeBuilderForm.addEventListener('submit', async (e) => {
+                    e.preventDefault(); 
+                    if (loggedInUser) {
+                        const resumeData = {
+                            contact: {
+                                name: document.getElementById('resume-name').value,
+                                phone: document.getElementById('resume-phone').value,
+                                email: document.getElementById('resume-email').value,
+                            },
+                            summary: document.getElementById('resume-summary').value
+                        };
+
+                        const response = await fetch('/api/workers/profile', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: loggedInUser.email, hasResume: true, resumeData })
+                        });
+
+                        if (response.ok) {
+                            loggedInUser.hasResume = true;
+                            loggedInUser.resumeData = resumeData;
+                            showMessage('Resume saved successfully!', 'success');
+                            updateUIForRole();
+                        } else {
+                            showMessage('Failed to save resume.', 'error');
+                        }
+                    }
+                });
+            }
+
+            // Handle PDF upload form submission
+            const resumeUploaderForm = document.getElementById('resume-uploader-form');
+            if (resumeUploaderForm) { 
+                resumeUploaderForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (loggedInUser) {
+                        const file = document.getElementById('resume-pdf').files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = async function (event) {
+                                const resumeData = { type: 'pdf', dataUrl: event.target.result, fileName: file.name };
+                                const response = await fetch('/api/workers/profile', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ email: loggedInUser.email, hasResume: true, resumeData })
+                                });
+                                if (response.ok) {
+                                    loggedInUser.hasResume = true;
+                                    loggedInUser.resumeData = resumeData;
+                                    showMessage('PDF resume uploaded successfully!', 'success');
+                                    updateUIForRole();
+                                } else {
+                                    showMessage('Failed to upload resume.', 'error');
+                                }
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            showMessage('Please select a PDF file to upload.', 'error');
+                        }
+                    }
+                });
+            }
+
+            // Handle profile editor form submission
+            const profileEditorForm = document.getElementById('profile-editor-form');
+            if (profileEditorForm) {
+                profileEditorForm.addEventListener('submit', saveProfile);
+            }
+
+            // Handle notification toggle icon click
+            document.getElementById('notification-toggle-icon').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const popover = document.getElementById('notification-popover');
+                popover.classList.toggle('active');
+            });
+
+            // Close popover when clicking outside
+            document.addEventListener('click', (e) => {
+                const popover = document.getElementById('notification-popover');
+                const icon = document.getElementById('notification-toggle-icon');
+                if (!popover.contains(e.target) && !icon.contains(e.target)) {
+                    popover.classList.remove('active');
+                }
+            });
+
+            // Initial call to set up the marquee
+            updateMarquee();
+        });
+
+        // --- Handle URL hash for password reset ---
+        window.addEventListener('hashchange', handleHashChange);
+        window.addEventListener('load', handleHashChange);
+
+        function handleHashChange() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#reset-password/')) {
+                const token = hash.split('/')[1];
+                showPage('reset-password-page');
+                addResetPasswordFormListener(token);
+            }
+        }
+
+        const showUploadedResumeSection = (resumeData) => {
+            document.getElementById('resume-builder-section').classList.add('hidden');
+            document.getElementById('resume-uploader-section').classList.remove('hidden');
+            document.getElementById('uploaded-resume-preview').classList.remove('hidden');
+            document.getElementById('uploaded-resume-link').href = resumeData.dataUrl;
+            document.getElementById('uploaded-resume-link').textContent = `View my Resume (${resumeData.fileName})`;
+        };
+
+        const showResumeBuilderSection = () => {
+            document.getElementById('resume-builder-section').classList.remove('hidden');
+            document.getElementById('resume-uploader-section').classList.remove('hidden');
+            document.getElementById('uploaded-resume-preview').classList.add('hidden');
+        };
+
+        const postNotification = (message, type, role) => {
+            const now = new Date();
+            notifications.unshift({
+                message,
+                type,
+                role,
+                timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+            // Keep only the 10 most recent notifications
+            if (notifications.length > 10) {
+                notifications.pop();
+            }
+            updateNotificationUI();
+        };
+
+        const updateNotificationUI = () => {
+            const popover = document.getElementById('notification-popover');
+            if (!popover) return;
+            const container = document.getElementById('notification-list');
+            const badge = document.getElementById('notification-badge');
+
+            const relevantNotifications = notifications.filter(n => n.role === currentUserRole || n.role === 'all');
+
+            if (relevantNotifications.length > 0) {
+                badge.classList.remove('hidden');
+                badge.textContent = relevantNotifications.length;
+                container.innerHTML = relevantNotifications.map(n => `
+                    <li class="p-3 mb-2 rounded-lg ${n.type === 'new-job' ? 'bg-indigo-100 text-indigo-800' : 'bg-blue-100 text-blue-800'}">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="font-semibold">${n.message}</span>
+                            <span class="text-xs text-gray-500">${n.timestamp}</span>
+                        </div>
+                    </li>
+                `).join('');
+            } else {
+                badge.classList.add('hidden');
+                container.innerHTML = '<li class="text-gray-500">No new notifications.</li>';
+            }
+        };
+
+        const addLiveUpdate = (message) => {
+            liveUpdates.push(message);
+            updateMarquee();
+        };
+
+        const updateMarquee = () => {
+            const marquee = document.getElementById('live-updates-marquee');
+            if (marquee) {
+                marquee.textContent = liveUpdates.join(' | ');
+            }
+        };
+
+        // Expose functions to global scope for use in inline event handlers
+        window.showJobDetail = showJobDetail;
+        window.showPage = showPage;
+        window.handleApply = handleApply;
+        window.findJobsByLocation = findJobsByLocation;
+        window.handleSaveJob = handleSaveJob;
+        window.handleDeleteJob = handleDeleteJob;
+        window.showEditJobPage = showEditJobPage;
+        window.fetchAndRenderJobs = fetchAndRenderJobs; // Expose for pagination controls
+        window.closeModal = closeModal;
+        window.currentSlide = (index) => {
+            const images = document.querySelectorAll('.slider-image');
+            const dots = document.querySelectorAll('.slider-dots .dot');
+            images.forEach(img => img.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            images[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentImageIndex = index;
+        };
+        window.showApplicants = showApplicants;
+        window.updateApplicationStatus = updateApplicationStatus;
+        window.showProfileEditorModal = showProfileEditorModal;
+        window.deleteProfile = deleteProfile;
+        window.downloadResume = downloadResume;
+        window.handleProfileImageUpload = handleProfileImageUpload;
+    </script>
+</body>
+
+</html>

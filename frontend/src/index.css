@@ -1,0 +1,205 @@
+:root,
+html[data-theme='light'],
+body[data-theme='light'] {
+  --app-bg: #f8f9fa;
+  --app-surface: #ffffff;
+  --app-surface-muted: #f1f3f5;
+  --app-text: #212529;
+  --app-text-muted: #6c757d;
+  --app-border: #dee2e6;
+  --app-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --app-link: #0d6efd;
+}
+
+html[data-theme='dark'],
+body[data-theme='dark'] {
+  --app-bg: #0f172a;
+  --app-surface: #111827;
+  --app-surface-muted: #1f2937;
+  --app-text: #f8fafc;
+  --app-text-muted: #cbd5e1;
+  --app-border: #334155;
+  --app-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --app-link: #60a5fa;
+}
+
+/* Basic reset to ensure consistent box model */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+/* Use a clean, modern font */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  min-height: 100vh;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+#root {
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+
+main,
+section,
+article,
+aside,
+nav,
+footer,
+header,
+div {
+  color: inherit;
+}
+
+a {
+  color: var(--app-link);
+}
+
+input,
+textarea,
+select,
+button {
+  color: inherit;
+}
+
+input,
+textarea,
+select {
+  background-color: var(--app-surface);
+  border-color: var(--app-border);
+}
+
+.card,
+.modal-content,
+.dropdown-menu,
+.table,
+.list-group-item,
+.accordion-item {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  border-color: var(--app-border);
+  box-shadow: var(--app-shadow);
+}
+
+.text-muted {
+  color: var(--app-text-muted) !important;
+}
+
+html[data-theme='dark'] .bg-white,
+body[data-theme='dark'] .bg-white,
+html[data-theme='dark'] .bg-light,
+body[data-theme='dark'] .bg-light,
+html[data-theme='dark'] .table-light,
+body[data-theme='dark'] .table-light {
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] .navbar,
+body[data-theme='dark'] .navbar,
+html[data-theme='dark'] .offcanvas,
+body[data-theme='dark'] .offcanvas,
+html[data-theme='dark'] .modal-content,
+body[data-theme='dark'] .modal-content,
+html[data-theme='dark'] .dropdown-menu,
+body[data-theme='dark'] .dropdown-menu {
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+  border-color: var(--app-border) !important;
+}
+
+html[data-theme='dark'] .text-dark,
+body[data-theme='dark'] .text-dark,
+html[data-theme='dark'] .text-black,
+body[data-theme='dark'] .text-black,
+html[data-theme='dark'] .navbar-light .navbar-brand,
+body[data-theme='dark'] .navbar-light .navbar-brand,
+html[data-theme='dark'] .navbar-light .navbar-nav .nav-link,
+body[data-theme='dark'] .navbar-light .navbar-nav .nav-link,
+html[data-theme='dark'] .dropdown-item,
+body[data-theme='dark'] .dropdown-item,
+html[data-theme='dark'] .form-label,
+body[data-theme='dark'] .form-label,
+html[data-theme='dark'] .form-check-label,
+body[data-theme='dark'] .form-check-label,
+html[data-theme='dark'] .btn-close + *,
+body[data-theme='dark'] .btn-close + * {
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] .border,
+body[data-theme='dark'] .border,
+html[data-theme='dark'] .border-top,
+body[data-theme='dark'] .border-top,
+html[data-theme='dark'] .border-bottom,
+body[data-theme='dark'] .border-bottom,
+html[data-theme='dark'] .border-start,
+body[data-theme='dark'] .border-start,
+html[data-theme='dark'] .border-end,
+body[data-theme='dark'] .border-end,
+html[data-theme='dark'] .dropdown-divider,
+body[data-theme='dark'] .dropdown-divider {
+  border-color: var(--app-border) !important;
+}
+
+html[data-theme='dark'] input,
+body[data-theme='dark'] input,
+html[data-theme='dark'] textarea,
+body[data-theme='dark'] textarea,
+html[data-theme='dark'] select,
+body[data-theme='dark'] select,
+html[data-theme='dark'] .form-control,
+body[data-theme='dark'] .form-control,
+html[data-theme='dark'] .form-select,
+body[data-theme='dark'] .form-select {
+  background-color: var(--app-surface-muted) !important;
+  color: var(--app-text) !important;
+  border-color: var(--app-border) !important;
+}
+
+html[data-theme='dark'] input::placeholder,
+body[data-theme='dark'] input::placeholder,
+html[data-theme='dark'] textarea::placeholder,
+body[data-theme='dark'] textarea::placeholder,
+html[data-theme='dark'] .form-control::placeholder,
+body[data-theme='dark'] .form-control::placeholder {
+  color: var(--app-text-muted) !important;
+}
+
+html[data-theme='dark'] .btn-outline-dark,
+body[data-theme='dark'] .btn-outline-dark,
+html[data-theme='dark'] .btn-outline-secondary,
+body[data-theme='dark'] .btn-outline-secondary {
+  color: var(--app-text) !important;
+  border-color: var(--app-border) !important;
+}
+
+html[data-theme='dark'] .btn-outline-dark:hover,
+body[data-theme='dark'] .btn-outline-dark:hover,
+html[data-theme='dark'] .btn-outline-secondary:hover,
+body[data-theme='dark'] .btn-outline-secondary:hover {
+  background-color: var(--app-surface-muted) !important;
+  color: #fff !important;
+  border-color: var(--app-border) !important;
+}
+
+/* Custom utility to handle the top banner offset cleanly */
+.app-container {
+  padding-top: 36px; /* Offset for the fixed top banner */
+}
+
+/* Ensure icons/text elements used as placeholders look good */
+.icon-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--app-surface-muted);
+}

@@ -1,0 +1,48 @@
+/* DateSeparator - Date Divider Component */
+
+.date-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 0 16px;
+  animation: slideInDown 0.3s ease-out;
+}
+
+.separator-line {
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+  transition: background 200ms ease;
+}
+
+.date-separator.dark .separator-line {
+  background: #374151;
+}
+
+.separator-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #9ca3af;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 200ms ease;
+}
+
+.date-separator.dark .separator-text {
+  color: #6b7280;
+}
+
+/* Animation */
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

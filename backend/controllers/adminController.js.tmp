@@ -1,0 +1,15 @@
+// createJob - Create a new job
+const createJob = async (req, res) => {
+    const { title, description, requirements, category, salary, location, type, company } = req.body;
+
+    if (!title || !description || !requirements || !category || !type || !company) {
+        throw new BadRequestError('Please provide all required fields');
+    }
+
+    const job = await Job.create({
+        ...req.body,
+        createdBy: req.user._id
+    });
+
+    res.status(StatusCodes.CREATED).json({ job });
+};

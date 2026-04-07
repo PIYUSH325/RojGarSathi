@@ -1,0 +1,86 @@
+/* TypingIndicator - Animated Typing Dots Component */
+
+.typing-indicator-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f0f1f9;
+  border-radius: 16px;
+  width: fit-content;
+  max-width: 200px;
+  animation: slideInLeft 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.typing-indicator-container.dark {
+  background: #374151;
+}
+
+/* Typing Indicator Dots */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  height: 16px;
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6b7280;
+  animation: typingBounce 1.4s ease-in-out infinite;
+  display: inline-block;
+}
+
+.typing-indicator-container.dark .typing-dot {
+  background: #d1d5db;
+}
+
+/* Stagger animation for each dot */
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Typing Text */
+.typing-text {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.typing-indicator-container.dark .typing-text {
+  color: #d1d5db;
+}
+
+/* Animation Keyframes */
+@keyframes typingBounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

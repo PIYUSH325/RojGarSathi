@@ -1,0 +1,108 @@
+/* MessageStatus - Message Delivery Status Component */
+
+.message-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #9ca3af;
+  opacity: 0.75;
+  transition: all 150ms ease;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.message-status.dark {
+  color: #6b7280;
+}
+
+/* Status Icon */
+.status-icon {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 150ms ease;
+}
+
+/* Status Time */
+.status-time {
+  font-size: 11px;
+  color: inherit;
+}
+
+/* Status Variants */
+.message-status.status-sending {
+  color: #f59e0b;
+  opacity: 0.9;
+}
+
+.message-status.status-sending .status-icon {
+  animation: spin 2s linear infinite;
+}
+
+.message-status.status-sent {
+  color: #6b7280;
+  opacity: 0.7;
+}
+
+.message-status.status-delivered {
+  color: #3b82f6;
+  opacity: 0.85;
+}
+
+.message-status.status-delivered .status-icon {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.message-status.status-seen {
+  color: #4f46e5;
+  opacity: 0.9;
+  font-weight: 600;
+}
+
+.message-status.status-seen .status-icon {
+  animation: slideInRight 0.3s ease-out, scaleBounce 0.4s 0.2s ease-out;
+}
+
+/* Animations */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleBounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Dark Mode */
+.message-status.dark.status-sent {
+  color: #d1d5db;
+}
