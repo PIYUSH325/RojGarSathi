@@ -5,7 +5,7 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const socketIO = require('socket.io');
-const cors = require('cors');
+// const cors = require('cors');
 const connectDB = require('./config/db');
 const setupSocketIO = require('./config/socketIO');
 
@@ -31,7 +31,7 @@ const authenticateUser = require('./middleware/auth'); // <-- NEW IMPORT: JWT Au
 
 
 const express = require("express");
-const cors = require("cors");
+// const cors = require("cors");
 require("dotenv").config();
 
 const mongoose = require("mongoose");
