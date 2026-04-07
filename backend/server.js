@@ -5,7 +5,6 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const socketIO = require('socket.io');
-// const cors = require('cors');
 const connectDB = require('./config/db');
 const setupSocketIO = require('./config/socketIO');
 
@@ -28,15 +27,10 @@ const { CustomAPIError, UnauthenticatedError, BadRequestError, NotFoundError } =
 const authenticateUser = require('./middleware/auth'); // <-- NEW IMPORT: JWT Authentication Middleware
 
 
-
-
-const express = require("express");
-// const cors = require("cors");
 require("dotenv").config();
 
 const mongoose = require("mongoose");
 
-// const app = express();
 
 app.use(cors());
 app.use(express.json());
