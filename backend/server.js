@@ -27,22 +27,33 @@ const { CustomAPIError, UnauthenticatedError, BadRequestError, NotFoundError } =
 // --- Middleware ---
 const authenticateUser = require('./middleware/auth'); // <-- NEW IMPORT: JWT Authentication Middleware
 
+
+
+
 const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
 
+const mongoose = require("mongoose");
 
-// ✅ ADD HERE
+// const app = express();
+
 app.use(cors());
-
 app.use(express.json());
 
-// your routes here
-// app.use("/api", require("./routes/..."));
+// ✅ MongoDB connection (ONLY ONCE)
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.log(err));
 
-// ✅ ADD THIS AT END
+// routes here
+
 // const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
 
 
 
